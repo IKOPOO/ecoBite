@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type SellerHandler struct {
@@ -37,7 +36,7 @@ func (h *SellerHandler) CreateSeller(c *gin.Context) {
 		})
 	}
 
-	storeImage, err := h.Service.ProdukImage.UploadInsertSingleImage(file)
+	storeImage, err := h.Service.ProdukImage.UploadSingleImage(file)
 
 	ktpImageFile, err := c.FormFile("ktp_image")
 	if err != nil {
@@ -46,7 +45,7 @@ func (h *SellerHandler) CreateSeller(c *gin.Context) {
 		})
 	}
 
-	ktpImage, error := h.Service.ProdukImage.UploadInsertSingleImage(ktpImageFile)
+	ktpImage, error := h.Service.ProdukImage.UploadSingleImage(ktpImageFile)
 	if error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body or missing fields",
@@ -77,5 +76,4 @@ func (h *SellerHandler) CreateSeller(c *gin.Context) {
 		"message": "user created successfully",
 		"data":    seller,
 	})
-
 }

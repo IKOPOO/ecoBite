@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type UserModel struct {
@@ -31,6 +32,7 @@ type RegisterRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 // insert new user data

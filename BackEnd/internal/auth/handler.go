@@ -131,6 +131,8 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 		Username: input.Username,
 		Email:    input.Email,
 		Password: passwordHash,
+		Status:   "pending",
+		Role:     input.Role,
 	}
 
 	// insert to database

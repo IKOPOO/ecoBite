@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SellerProfileRoutes(rg *gin.RouterGroup, pengurusHandler *handler.SellerHandler) {
+func SellerProfileRoutes(rg *gin.RouterGroup, sellerHandler *handler.SellerHandler) {
 	// public api
-	p := rg.Group("/pengurus")
+	p := rg.Group("/seller")
 	// public api
 	{
-		p.POST("/", pengurusHandler.CreateSeller)
+		p.POST("/", sellerHandler.CreateSeller)
 	}
 
 }

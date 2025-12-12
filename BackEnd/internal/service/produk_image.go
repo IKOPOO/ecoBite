@@ -12,7 +12,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type ProdukImageService struct {
@@ -136,33 +135,4 @@ func (m *ProdukImageService) UploadSingleImage(files *multipart.FileHeader) (*mo
 	}
 
 	return uploadedFile, nil
-}
-
-func (m *ProdukImageService) UploadInsertSingleImage(files *multipart.FileHeader) (*model.ProductImage, error) {
-	// upload file first
-	uploadedFile, err := m.UploadSingleImage(files)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to upload file to storage: %v", err)
-	}
-
-	// insert to database
-	fileUpload := &model.ProductImage{
-		ID: uuid.New(),
-	}
-
-	upload, err := m.InsertGallery(fileUpload)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to insert data: %v", err)
-	}
-
-	return &model.GalleryResponse{
-		ID:          upload.ID,
-		GalleryName: upload.GalleryName,
-		GalleryType: upload.GalleryType,
-		Description: upload.Description,
-		EventDate:   upload.EventDate,
-		FileSize:    upload.FileSize,
-		MimeType:    upload.MimeType,
-		AssetUrl:    upload.AssetUrl,
-	}, nil
 }
