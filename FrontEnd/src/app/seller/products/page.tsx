@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Loader2, CheckCircle, XCircle, AlertTriangle, Upload } from "lucide-react"
 
 const initialProducts = [
   {
@@ -90,6 +90,12 @@ function getStatusBadge(status: string) {
   return <Badge className={styles[status]}>{labels[status]}</Badge>
 }
 
+interface VerificationResult {
+  safety_status: "Lolos" | "Tolak"
+  reason: string
+  confidence_score: number
+}
+
 export default function SellerProductsPage() {
   const [products, setProducts] = useState(initialProducts)
   const [searchQuery, setSearchQuery] = useState("")
@@ -104,9 +110,65 @@ export default function SellerProductsPage() {
     description: "",
   })
 
+  // Verification State
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+        setVerificationResult(null) // Reset verification when new image uploaded
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleVerifyProduct = async () => {
+    if (!imagePreview) return
+
+    setIsVerifying(true)
+    try {
+      const response = await fetch("/api/verify-product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: imagePreview,
+          name: newProduct.name,
+          description: newProduct.description,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setVerificationResult(data)
+      } else {
+        console.error("Verification failed:", data)
+        alert("Gagal memverifikasi produk: " + (data.error || "Unknown error"))
+      }
+    } catch (error) {
+      console.error("Error verifying product:", error)
+      alert("Terjadi kesalahan saat memverifikasi produk")
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
   const handleAddProduct = () => {
+    if (verificationResult?.safety_status === "Tolak") {
+      alert("Produk tidak dapat ditambahkan karena tidak lolos verifikasi: " + verificationResult.reason)
+      return
+    }
+
     const product = {
       id: String(products.length + 1),
       name: newProduct.name,
@@ -127,6 +189,9 @@ export default function SellerProductsPage() {
       expiry: "",
       description: "",
     })
+    setImagePreview(null)
+    setVerificationResult(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
     setIsAddDialogOpen(false)
   }
 
@@ -149,11 +214,80 @@ export default function SellerProductsPage() {
               Tambah Produk
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Tambah Produk Baru</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              {/* Image Upload Section */}
+              <div className="grid gap-2">
+                <Label>Foto Produk</Label>
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      ref={fileInputRef}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  {imagePreview && (
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {imagePreview && (
+                    <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/50">
+                      <div className="flex items-center gap-2">
+                        {isVerifying ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                            <span className="text-sm font-medium">Memverifikasi kualitas...</span>
+                          </>
+                        ) : verificationResult ? (
+                          <>
+                            {verificationResult.safety_status === "Lolos" ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-red-600" />
+                            )}
+                            <div className="flex flex-col">
+                              <span className={`text-sm font-medium ${verificationResult.safety_status === "Lolos" ? "text-green-600" : "text-red-600"
+                                }`}>
+                                {verificationResult.safety_status === "Lolos" ? "Verifikasi Lolos" : "Verifikasi Ditolak"}
+                              </span>
+                              {verificationResult.reason && (
+                                <span className="text-xs text-muted-foreground">{verificationResult.reason}</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                            <span className="text-sm text-muted-foreground">Foto belum diverifikasi</span>
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={verificationResult?.safety_status === "Lolos" ? "outline" : "default"}
+                        onClick={handleVerifyProduct}
+                        disabled={isVerifying}
+                      >
+                        {isVerifying ? "Memproses..." : verificationResult ? "Verifikasi Ulang" : "Verifikasi Sekarang"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="name">Nama Produk</Label>
                 <Input
@@ -244,7 +378,11 @@ export default function SellerProductsPage() {
                   rows={3}
                 />
               </div>
-              <Button onClick={handleAddProduct} className="mt-2">
+              <Button
+                onClick={handleAddProduct}
+                className="mt-2"
+                disabled={!imagePreview || verificationResult?.safety_status === "Tolak" || isVerifying}
+              >
                 Simpan Produk
               </Button>
             </div>
