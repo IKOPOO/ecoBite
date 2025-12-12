@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LeafIcon, EyeIcon, EyeOffIcon } from "@/components/icons"
+import { LeafIcon, EyeIcon, EyeOffIcon, ArrowLeftIcon } from "@/components/icons"
 
 type UserRole = "buyer" | "seller" | "admin"
 
@@ -29,8 +29,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 relative">
+      <Link href="/" className="absolute top-4 left-4 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors z-10">
+        <ArrowLeftIcon className="size-5" />
+        <span className="font-medium">Kembali</span>
+      </Link>
+      <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary">

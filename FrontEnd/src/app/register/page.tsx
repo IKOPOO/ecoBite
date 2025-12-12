@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LeafIcon, EyeIcon, EyeOffIcon, StoreIcon, ShoppingBagIcon } from "@/components/icons"
+import { LeafIcon, EyeIcon, EyeOffIcon, StoreIcon, ShoppingBagIcon, ArrowLeftIcon } from "@/components/icons"
 
 type UserRole = "buyer" | "seller"
 
@@ -38,8 +38,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 relative">
+      <Link href="/" className="absolute top-4 left-4 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors z-10">
+        <ArrowLeftIcon className="size-5" />
+        <span className="font-medium">Kembali</span>
+      </Link>
+      <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
@@ -59,14 +63,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("buyer")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${
-                    role === "buyer" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                  }`}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "buyer" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
+                    }`}
                 >
                   <div
-                    className={`flex size-12 items-center justify-center rounded-full ${
-                      role === "buyer" ? "bg-primary/10" : "bg-muted"
-                    }`}
+                    className={`flex size-12 items-center justify-center rounded-full ${role === "buyer" ? "bg-primary/10" : "bg-muted"
+                      }`}
                   >
                     <ShoppingBagIcon
                       className={`size-6 ${role === "buyer" ? "text-primary" : "text-muted-foreground"}`}
@@ -78,14 +80,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("seller")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${
-                    role === "seller" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                  }`}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "seller" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
+                    }`}
                 >
                   <div
-                    className={`flex size-12 items-center justify-center rounded-full ${
-                      role === "seller" ? "bg-primary/10" : "bg-muted"
-                    }`}
+                    className={`flex size-12 items-center justify-center rounded-full ${role === "seller" ? "bg-primary/10" : "bg-muted"
+                      }`}
                   >
                     <StoreIcon className={`size-6 ${role === "seller" ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
@@ -96,25 +96,18 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Lengkap</Label>
-              <Input id="name" type="text" placeholder="Masukkan nama lengkap" required />
+              <Label htmlFor="name">Nama</Label>
+              <Input id="name" type="text" placeholder="Masukkan nama anda" required />
             </div>
 
-            {role === "seller" && (
-              <div className="space-y-2">
-                <Label htmlFor="storeName">Nama Toko/Restoran</Label>
-                <Input id="storeName" type="text" placeholder="Masukkan nama toko" required />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" type="text" placeholder="Masukkan username" required />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="nama@email.com" required />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Nomor Telepon</Label>
-              <Input id="phone" type="tel" placeholder="08xxxxxxxxxx" required />
             </div>
 
             <div className="space-y-2">
