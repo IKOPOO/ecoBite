@@ -4,9 +4,11 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     try {
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        console.log("Using API Key:", apiKey ? apiKey.substring(0, 5) + "..." : "undefined");
+
+        if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
             return NextResponse.json(
-                { error: "GEMINI_API_KEY is not configured" },
+                { error: "GEMINI_API_KEY is not configured. Please check your .env file." },
                 { status: 500 }
             );
         }
@@ -22,26 +24,30 @@ export async function POST(request: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Switching to gemini-flash-latest to avoid 404/429 issues
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const prompt = `
       Anda adalah sistem verifikasi kualitas produk untuk marketplace food rescue 'ecoBite'.
 
-      TUGAS: Analisis foto produk ini berdasarkan kriteria di bawah.
+      TUGAS: Analisis HANYA foto produk yang diunggah. Abaikan jika nama/deskripsi kosong. Fokus pada kelayakan visual makanan.
 
-      DATA INPUT:
+      DATA INPUT (Hanya sebagai referensi, bukan syarat utama):
       - Nama Produk: ${name || "Tidak diketahui"}
       - Deskripsi: ${description || "Tidak ada deskripsi"}
 
       INSTRUKSI VERIFIKASI:
-      1.  **Safety/Moderation**: Apakah gambar mengandung konten terlarang, spam, atau materi SARA? (Ya/Tidak)
-      2.  **Kelayakan Konsumsi**: Apakah produk makanan dalam foto terlihat segar, tidak ada jamur/tanda busuk, dan layak dikonsumsi? (Ya/Tidak/Unclear)
-      3.  **Relevansi/Kesesuaian**: Apakah objek di foto sesuai dengan 'Nama Produk' dan 'Deskripsi' yang diberikan? (Ya/Tidak)
+      1.  **Safety/Moderation**: Apakah gambar aman dan bukan konten terlarang?
+      2.  **Kelayakan Konsumsi**: Tentukan kelayakan berdasarkan visual foto saja (kesegaran, kemasan utuh, tidak busuk).
 
-      OUTPUT HARUS DALAM FORMAT JSON BERIKUT (tanpa markdown formatting, hanya raw json):
+      ATURAN OUTPUT:
+      - Berikan respons JSON.
+      - "reason" maksimal 5 kata. Singkat, padat, jelas.
+
+      OUTPUT FORMAT (JSON RAW):
       {
         "safety_status": "Lolos" | "Tolak",
-        "reason": "Alasan spesifik penolakan jika 'Tolak'",
+        "reason": "Alasan singkat (maks 10 kata)",
         "confidence_score": [Skor 0.0 - 1.0]
       }
     `;
@@ -75,10 +81,13 @@ export async function POST(request: Request) {
                 { status: 500 }
             );
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Verification error:", error);
         return NextResponse.json(
-            { error: "Internal server error" },
+            {
+                error: error.message || "Internal server error",
+                details: error.toString()
+            },
             { status: 500 }
         );
     }

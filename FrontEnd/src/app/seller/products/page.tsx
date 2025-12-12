@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Loader2, CheckCircle, XCircle, AlertTriangle, Upload } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Loader2, CheckCircle, XCircle, AlertTriangle, Upload, Camera } from "lucide-react"
 
 const initialProducts = [
   {
@@ -110,24 +110,68 @@ export default function SellerProductsPage() {
     description: "",
   })
 
-  // Verification State
+  // Verification & Camera State
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Camera Refs & State
+  const [isCameraOpen, setIsCameraOpen] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
+  const startCamera = async () => {
+    try {
+      setIsCameraOpen(true)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      })
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err)
+      setIsCameraOpen(false)
+      alert("Gagal mengakses kamera. Pastikan izin kamera diberikan.")
+    }
+  }
 
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-        setVerificationResult(null) // Reset verification when new image uploaded
-      }
-      reader.readAsDataURL(file)
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current = null
     }
+    setIsCameraOpen(false)
+  }
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current
+      const canvas = canvasRef.current
+
+      // Set canvas size to match video dimension
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+
+      const context = canvas.getContext('2d')
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const dataUrl = canvas.toDataURL('image/jpeg')
+        setImagePreview(dataUrl)
+        setVerificationResult(null)
+        stopCamera()
+      }
+    }
+  }
+
+  const handleRetake = () => {
+    setImagePreview(null)
+    setVerificationResult(null)
+    startCamera()
   }
 
   const handleVerifyProduct = async () => {
@@ -191,7 +235,9 @@ export default function SellerProductsPage() {
     })
     setImagePreview(null)
     setVerificationResult(null)
-    if (fileInputRef.current) fileInputRef.current.value = ""
+    setImagePreview(null)
+    setVerificationResult(null)
+    // Removed legacy fileInputRef usage
     setIsAddDialogOpen(false)
   }
 
@@ -223,14 +269,46 @@ export default function SellerProductsPage() {
               <div className="grid gap-2">
                 <Label>Foto Produk</Label>
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      ref={fileInputRef}
-                      className="cursor-pointer"
-                    />
+                  <div className="flex flex-col gap-4">
+                    {!isCameraOpen && !imagePreview && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full h-32 border-dashed border-2 flex flex-col items-center justify-center gap-2 hover:bg-muted/50 transition-colors"
+                        onClick={startCamera}
+                      >
+                        <Camera className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-muted-foreground font-medium">Buka Kamera</span>
+                      </Button>
+                    )}
+
+                    {isCameraOpen && (
+                      <div className="relative w-full overflow-hidden rounded-lg bg-black">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          className="w-full h-auto object-cover"
+                        />
+                        <canvas ref={canvasRef} className="hidden" />
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={stopCamera}
+                          >
+                            Batal
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={capturePhoto}
+                            className="bg-white text-black hover:bg-gray-200"
+                          >
+                            Ambil Foto
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   {imagePreview && (
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
@@ -275,14 +353,23 @@ export default function SellerProductsPage() {
                           </div>
                         )}
                       </div>
-                      <Button
-                        size="sm"
-                        variant={verificationResult?.safety_status === "Lolos" ? "outline" : "default"}
-                        onClick={handleVerifyProduct}
-                        disabled={isVerifying}
-                      >
-                        {isVerifying ? "Memproses..." : verificationResult ? "Verifikasi Ulang" : "Verifikasi Sekarang"}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleRetake}
+                        >
+                          Foto Ulang
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={verificationResult?.safety_status === "Lolos" ? "outline" : "default"}
+                          onClick={handleVerifyProduct}
+                          disabled={isVerifying}
+                        >
+                          {isVerifying ? "Memproses..." : verificationResult ? "Verifikasi Ulang" : "Verifikasi Sekarang"}
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -480,6 +567,6 @@ export default function SellerProductsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   )
 }
