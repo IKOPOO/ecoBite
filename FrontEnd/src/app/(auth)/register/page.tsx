@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LeafIcon, EyeIcon, EyeOffIcon, StoreIcon, ShoppingBagIcon } from "@/components/shared/icons"
+import { LeafIcon, EyeIcon, EyeOffIcon, StoreIcon, ShoppingBagIcon, ArrowLeftIcon } from "@/components/shared/icons"
 
 type UserRole = "buyer" | "seller"
 
@@ -39,13 +39,13 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 relative">
-      <Link
-        href="/"
-        className="absolute top-4 left-4 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors z-10"
+      <button
+        onClick={() => router.back()}
+        className="absolute top-4 left-4 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
       >
         <ArrowLeftIcon className="size-5" />
         <span className="font-medium">Kembali</span>
-      </Link>
+      </button>
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
