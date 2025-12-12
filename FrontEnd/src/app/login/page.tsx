@@ -16,9 +16,7 @@ type UserRole = "buyer" | "seller" | "admin"
 export default function LoginPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-  const [role, setRole] = useState<UserRole>("buyer")
   const [isLoading, setIsLoading] = useState(false)
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
@@ -26,14 +24,8 @@ export default function LoginPage() {
     // Simulate login
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Redirect based on role
-    if (role === "buyer") {
-      router.push("/marketplace")
-    } else if (role === "seller") {
-      router.push("/seller/dashboard")
-    } else {
-      router.push("/admin/dashboard")
-    }
+    // Default redirect to marketplace for demo
+    router.push("/marketplace")
   }
 
   return (
@@ -51,30 +43,7 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Role Selector */}
-            <div className="space-y-2">
-              <Label>Masuk Sebagai</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: "buyer", label: "Pembeli" },
-                  { value: "seller", label: "Penjual" },
-                  { value: "admin", label: "Admin" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setRole(option.value as UserRole)}
-                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-                      role === option.value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background hover:bg-muted"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

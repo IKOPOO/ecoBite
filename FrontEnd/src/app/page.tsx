@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { LandingHero } from "@/components/landing-hero"
+import { MapWrapper } from "@/components/map-wrapper"
+
 import {
   LeafIcon,
   RecycleIcon,
@@ -20,90 +23,7 @@ export default function LandingPage() {
       <Header variant="landing" />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-secondary/50 to-background py-20 lg:py-32">
-          <div className="container mx-auto px-4">
-            <div className="grid items-center gap-12 lg:grid-cols-2">
-              <div className="space-y-8">
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5">
-                  <RecycleIcon className="size-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Food Rescue Marketplace</span>
-                </div>
-                <h1 className="text-balance text-4xl font-bold tracking-tight lg:text-6xl">
-                  Kurangi Food Waste, <span className="text-primary">Hemat Pengeluaran</span>
-                </h1>
-                <p className="max-w-lg text-lg text-muted-foreground">
-                  Selamatkan makanan berkualitas dari restoran dan toko dengan harga hemat hingga 70%. Bersama kita
-                  wujudkan gaya hidup berkelanjutan.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Link href="/marketplace">
-                    <Button size="lg" className="gap-2">
-                      Mulai Belanja
-                      <ChevronRightIcon className="size-4" />
-                    </Button>
-                  </Link>
-                  <Link href="/register?role=seller">
-                    <Button size="lg" variant="outline" className="gap-2 bg-transparent">
-                      <StoreIcon className="size-4" />
-                      Daftar Sebagai Penjual
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Stats Preview */}
-                <div className="flex flex-wrap gap-8 pt-4">
-                  <div>
-                    <p className="text-3xl font-bold text-primary">12,500+</p>
-                    <p className="text-sm text-muted-foreground">Kg Food Waste Diselamatkan</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-primary">8,200+</p>
-                    <p className="text-sm text-muted-foreground">Pengguna Aktif</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-primary">350+</p>
-                    <p className="text-sm text-muted-foreground">Mitra Penjual</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hero Image */}
-              <div className="relative">
-                <div className="relative aspect-square overflow-hidden rounded-3xl">
-                  <img
-                    src="/fresh-vegetables-fruits-bread-pastries-food-rescue.jpg"
-                    alt="Makanan segar yang diselamatkan"
-                    className="size-full object-cover"
-                  />
-                </div>
-                {/* Floating Cards */}
-                <div className="absolute -left-4 bottom-8 rounded-xl border bg-card p-4 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-                      <LeafIcon className="size-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Ramah Lingkungan</p>
-                      <p className="text-sm text-muted-foreground">Kurangi emisi CO2</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -right-4 top-8 rounded-xl border bg-card p-4 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-accent/50">
-                      <ShoppingBagIcon className="size-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Hemat 70%</p>
-                      <p className="text-sm text-muted-foreground">Dari harga normal</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <LandingHero />
 
         {/* How It Works */}
         <section id="cara-kerja" className="py-20 lg:py-32">
@@ -242,6 +162,19 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Location / Map Section */}
+        <section className="py-20 lg:py-32 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto mb-10 max-w-2xl text-center">
+              <h2 className="mb-4 text-3xl font-bold lg:text-4xl">Toko yang terdaftar</h2>
+              <p className="text-lg text-muted-foreground">
+                Temukan kami di Semarang dan bergabunglah dengan gerakan food rescue
+              </p>
+            </div>
+            <MapWrapper />
           </div>
         </section>
       </main>

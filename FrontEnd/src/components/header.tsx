@@ -43,6 +43,12 @@ export function Header({ variant = "landing" }: HeaderProps) {
           {variant === "landing" && (
             <>
               <Link
+                href="/"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Beranda
+              </Link>
+              <Link
                 href="#cara-kerja"
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
@@ -54,12 +60,7 @@ export function Header({ variant = "landing" }: HeaderProps) {
               >
                 Tentang Kami
               </Link>
-              <Link
-                href="/marketplace"
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Marketplace
-              </Link>
+
             </>
           )}
           {variant === "marketplace" && (
@@ -168,15 +169,16 @@ export function Header({ variant = "landing" }: HeaderProps) {
         <nav className="flex flex-col gap-4">
           {variant === "landing" && (
             <>
+              <Link href="/" className="text-sm font-medium text-muted-foreground">
+                Beranda
+              </Link>
               <Link href="#cara-kerja" className="text-sm font-medium text-muted-foreground">
                 Cara Kerja
               </Link>
               <Link href="#tentang" className="text-sm font-medium text-muted-foreground">
                 Tentang Kami
               </Link>
-              <Link href="/marketplace" className="text-sm font-medium text-muted-foreground">
-                Marketplace
-              </Link>
+
               <div className="flex flex-col gap-2 pt-4">
                 <Link href="/login">
                   <Button variant="outline" className="w-full bg-transparent">
