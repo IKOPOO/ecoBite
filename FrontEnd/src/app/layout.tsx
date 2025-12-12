@@ -1,11 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import { CartProvider } from "@/lib/cart-context"
-import { AuthProvider } from "@/lib/auth-context"
-import { NotificationProvider } from "@/lib/notification-context"
-import { ChatProvider } from "@/lib/chat-context"
+// import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react"
+import { CartProvider } from "@/providers/cart-provider"
+import { AuthProvider } from "@/providers/auth-provider"
+import { NotificationProvider } from "@/providers/notification-provider"
+import { ChatProvider } from "@/providers/chat-provider"
 import "./globals.css"
 
 const plusJakarta = Plus_Jakarta_Sans({
