@@ -60,7 +60,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	}
 
 	// check the role
-	allowedRoles := []string{"Super_Admin", "Kor_Pemro", "Kor_Jaringan", "Kor_Data", "Kor_Medcrev", "BPH", "pemro_ang", "jaringan_ang", "medcrev_ang", "data_ang", "BPH_ang"}
+	allowedRoles := []string{"admin", "seller", "buyer"}
 
 	if !slices.Contains(allowedRoles, user.Role) {
 		c.JSON(http.StatusUnauthorized, gin.H{

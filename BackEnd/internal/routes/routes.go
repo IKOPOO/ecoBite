@@ -3,8 +3,8 @@ package routes
 import (
 	"ecobite/internal/auth"
 	"ecobite/internal/config"
-	"ecobite/internal/database/model"
-	routes "ecobite/internal/routes"
+	//"ecobite/internal/database/model"
+	routes "ecobite/internal/routes/route"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ func Routes(app *config.Application) http.Handler {
 	{
 		authHandler := auth.NewUserauth(&app.Model.Users)
 
-		routes.authHandler(v1, authHandler)
+		routes.AuthRoutes(v1, authHandler)
 	}
 
 	return r
