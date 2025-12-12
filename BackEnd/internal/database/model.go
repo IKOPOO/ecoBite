@@ -16,6 +16,7 @@ type Models struct {
 	OrderItem     model.OrderItemModel
 	Payment       model.PaymentModel
 	Review        model.RiviewModel
+	ProductImage  model.ProductImagesModel
 
 	// Activities model.ActivityModel // Uncomment if you have ActivityModel
 }
@@ -31,6 +32,7 @@ func NewModel(db *gorm.DB) Models {
 		OrderItem:     model.OrderItemModel{DB: db},
 		Payment:       model.PaymentModel{DB: db},
 		Review:        model.RiviewModel{DB: db},
+		ProductImage:  model.ProductImagesModel{DB: db},
 		// Activities: model.ActivityModel{DB: db}, // Uncomment if you have ActivityModel
 	}
 }
