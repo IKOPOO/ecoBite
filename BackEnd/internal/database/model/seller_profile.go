@@ -2,9 +2,10 @@ package model
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type SellerProfileModel struct {
@@ -37,7 +38,7 @@ type SellerProfile struct {
 }
 
 type CreateSellerProfileRequest struct {
-	UserID           string `form:"user_id" validate:"required,uuid4"`
+	UserID           string `form:"user_id"`
 	StoreName        string `form:"store_name" validate:"required"`
 	OwnerName        string `form:"owner_name" validate:"required"`
 	Address          string `form:"address" validate:"required"`
@@ -48,12 +49,28 @@ type CreateSellerProfileRequest struct {
 	KTPImage         string `form:"ktp_image"`         // untuk upload file
 }
 
+type SellerProfileResponse struct {
+	UserID           string `form:"user_id"`
+	StoreName        string `form:"store_name"`
+	OwnerName        string `form:"owner_name"`
+	Address          string `form:"address"`
+	Phone            string `form:"phone"`
+	StoreImage       string `form:"store_image"`       // untuk upload file
+	StoreDescription string `form:"store_description"` // teks biasa
+	KTPNumber        string `form:"ktp_number"`        // teks biasa
+	KTPImage         string `form:"ktp_image"`         // untuk upload file
+}
+
+func (SellerProfile) TableName() string {
+	return "seller_profile"
+}
+
 func (m *SellerProfileModel) InsertSellerProfile(seller *SellerProfile) error {
-	var user SellerProfile
-	if err := m.DB.First(&user, seller.UserID).Error; err != nil {
-		return fmt.Errorf("user_id tidak ditemukan")
+	userModel := UserModel{DB: m.DB}
+	_, err := userModel.GetUserById(seller.UserID)
+	if err != nil {
+		return fmt.Errorf("user_id tidak ditemukan: %v", err)
 	}
-	// Validasi email unik
 	seller.CreatedAt = time.Now()
 	result := m.DB.Create(seller)
 	if result.Error != nil {
@@ -63,5 +80,14 @@ func (m *SellerProfileModel) InsertSellerProfile(seller *SellerProfile) error {
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("no row inserted")
 	}
+
 	return nil
+}
+
+func (m *SellerProfileModel) GetSellerProfileById(UserID uuid.UUID) (*SellerProfile, error) {
+	var seller SellerProfile
+	if err := m.DB.First(&seller, "user_id = ?", UserID).Error; err != nil {
+		return nil, err
+	}
+	return &seller, nil
 }
