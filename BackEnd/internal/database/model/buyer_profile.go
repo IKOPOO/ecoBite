@@ -28,12 +28,24 @@ type BuyerProfile struct {
 }
 
 type CreateBuyerProfileRequest struct {
-	UserID       string `form:"user_id" json:"user_id"`
-	FullName     string `form:"full_name" json:"full_name" binding:"required"`
-	Phone        string `form:"phone" json:"phone" binding:"required"`
-	Address      string `form:"address" json:"address" binding:"required"`
-	Allergic     string `form:"allergic" json:"allergic"`
-	ProfileImage string `form:"profile_image" json:"profile_image"` // bisa URL atau nanti di-handle upload file
+	UserID   string `form:"user_id" json:"user_id"`
+	FullName string `form:"full_name" json:"full_name" binding:"required"`
+	Phone    string `form:"phone" json:"phone" binding:"required"`
+	Address  string `form:"address" json:"address" binding:"required"`
+	Allergic string `form:"allergic" json:"allergic"`
+}
+
+type CreateBuyerProfileResponse struct {
+	ID       uuid.UUID `json:"id"`
+	UserID   string    `json:"user_id"`
+	FullName string    `json:"full_name"`
+	Phone    string    `json:"phone"`
+	Address  string    `json:"address"`
+	Allergic string    `json:"allergic"`
+}
+
+func (BuyerProfile) TableName() string {
+	return "buyer_profile"
 }
 
 func (m *BuyerProfileModel) InsertBuyerProfile(buyer *BuyerProfile) error {
@@ -53,4 +65,12 @@ func (m *BuyerProfileModel) InsertBuyerProfile(buyer *BuyerProfile) error {
 	}
 
 	return nil
+}
+
+func (m *BuyerProfileModel) GetBuyerProfileById(UserID uuid.UUID) (*BuyerProfile, error) {
+	var buyer BuyerProfile
+	if err := m.DB.First(&buyer, "user_id = ?", UserID).Error; err != nil {
+		return nil, err
+	}
+	return &buyer, nil
 }

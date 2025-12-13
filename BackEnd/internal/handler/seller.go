@@ -110,7 +110,7 @@ func (h *SellerHandler) GetSellerProfile(c *gin.Context) {
 		KTPImage:         seller.KtpImage,
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "Get pengurus",
-		"pengurus": resp,
+		"message": "seler profile",
+		"data":    resp,
 	})
 }
