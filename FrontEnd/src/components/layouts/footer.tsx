@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-14 w-auto" />
+              <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-24 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground">
               Marketplace food rescue yang menghubungkan restoran dengan pembeli untuk mengurangi food waste.

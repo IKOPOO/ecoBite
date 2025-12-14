@@ -1,14 +1,9 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
-// import { Analytics } from "@vercel/analytics/react"
 import { Analytics } from "@vercel/analytics/react"
-import { CartProvider } from "@/providers/cart-provider"
-import { AuthProvider } from "@/providers/auth-provider"
-import { NotificationProvider } from "@/providers/notification-provider"
-import { ChatProvider } from "@/providers/chat-provider"
-import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
+import { AppProvider } from "@/providers/app-provider"
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -26,20 +21,7 @@ export const metadata: Metadata = {
     "Kurangi Food Waste, Hemat Pengeluaran. Marketplace yang menghubungkan restoran dengan pembeli untuk menjual makanan layak konsumsi dengan harga murah.",
   generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
+    icon: "/favicon.ico",
     apple: "/apple-icon.png",
   },
 }
@@ -52,14 +34,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${plusJakarta.variable} ${geistMono.variable} font-sans antialiased`}>
-        <AuthProvider>
-          <NotificationProvider>
-            <ChatProvider>
-              <CartProvider>{children}</CartProvider>
-            </ChatProvider>
-          </NotificationProvider>
-        </AuthProvider>
-        <Toaster />
+        <AppProvider>{children}</AppProvider>
         <Analytics />
       </body>
     </html>

@@ -1,32 +1,31 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { LeafIcon, EyeIcon, EyeOffIcon, ArrowLeftIcon } from "@/components/shared/icons"
+import { LeafIcon } from "@/components/shared/icons"
 import BackButton from "@/components/shared/back-button"
-
-type UserRole = "buyer" | "seller" | "admin"
+import { useLogin } from "@/hooks/use-auth"
+import { useForm } from "react-hook-form"
+import { LoginFormValues, LoginSchema } from "@/services/auth-service"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { ArrowRight, Loader2 } from "lucide-react"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const { mutate, isPending } = useLogin()
 
-    // Simulate login
-    await new Promise(resolve => setTimeout(resolve, 1000))
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
 
-    // Default redirect to marketplace for demo
-    router.push("/marketplace")
+  const onSubmit = (data: LoginFormValues) => {
+    mutate(data)
   }
 
   return (
@@ -34,47 +33,65 @@ export default function LoginPage() {
       <BackButton className="absolute left-4 top-4 z-10" label="Kembali" />
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
-          <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-16 w-auto" />
+          <Link href="/" className="mx-auto my-4 flex items-center gap-2 w-32 h-20">
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="w-full" />
           </Link>
           <CardTitle className="text-2xl">Selamat Datang Kembali</CardTitle>
           <CardDescription>Masuk ke akun SavorBite Anda</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="nama@email.com" required />
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* --- EMAIL --- */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@kamu.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                  Lupa password?
-                </Link>
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOffIcon className="size-5" /> : <EyeIcon className="size-5" />}
-                </button>
-              </div>
-            </div>
+              {/* --- PASSWORD --- */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <Link href="#" className="text-xs text-muted-foreground hover:underline hover:text-primary">
+                        Lupa password?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input type="password" placeholder="******" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Memproses..." : "Masuk"}
-            </Button>
-          </form>
+              {/* --- TOMBOL SUBMIT --- */}
+              <Button className="w-full" size="lg" type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    Masuk Sekarang <ArrowRight className="ml-2 size-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-6 text-center text-sm">
             Belum punya akun?{" "}

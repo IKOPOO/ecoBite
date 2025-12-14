@@ -9,10 +9,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { MinusIcon, PlusIcon, TrashIcon, ShoppingBagIcon, ChevronRightIcon, LeafIcon } from "@/components/shared/icons"
 import { useCart } from "@/providers/cart-provider"
 import { formatPrice } from "@/lib/data"
+import { useOrder } from "@/providers/order-provider"
+import { toast } from "sonner"
 
 export default function CartPage() {
   const router = useRouter()
-  const { items, removeFromCart, updateQuantity, subtotal, totalItems } = useCart()
+  const { items, removeFromCart, updateQuantity, subtotal, totalItems, clearCart } = useCart()
+  const { addOrder } = useOrder()
 
   const totalFoodWasteSaved = items.reduce((acc, item) => acc + item.product.foodWasteSaved * item.quantity, 0)
 
@@ -38,6 +41,20 @@ export default function CartPage() {
         <Footer />
       </div>
     )
+  }
+
+  const handleCheckout = () => {
+    if (items.length === 0) return
+
+    // 1. Buat Order Baru
+    addOrder(items, subtotal)
+
+    // 2. Kosongkan Keranjang
+    clearCart()
+
+    // 3. Redirect ke Halaman Pesanan dengan parameter success
+    toast.success("Pesanan berhasil dibuat!")
+    router.push("/buyer/orders?success=true")
   }
 
   return (
@@ -168,7 +185,7 @@ export default function CartPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" size="lg" onClick={() => router.push("/buyer/checkout")}>
+                  <Button className="w-full" size="lg" onClick={handleCheckout}>
                     Checkout
                   </Button>
                 </CardFooter>

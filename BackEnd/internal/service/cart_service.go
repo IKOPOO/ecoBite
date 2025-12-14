@@ -19,11 +19,13 @@ func NewCartService(
 	cartModel *model.CartModel,
 	cartItemModel *model.CartItemModel,
 	productModel *model.ProductModel,
+	buyerService *BuyerService,
 ) *CartService {
 	return &CartService{
 		Cart:     cartModel,
 		CartItem: cartItemModel,
 		Product:  productModel,
+		Buyer:    buyerService,
 	}
 }
 

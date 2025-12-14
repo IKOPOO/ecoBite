@@ -1,56 +1,64 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 
-// Fix for default marker icon in Next.js
-const fixLeafletIcon = () => {
-  // @ts-ignore
-  delete L.Icon.Default.prototype._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-  })
+// PERBAIKAN 1: Gunakan URL CDN agar icon langsung muncul tanpa perlu file lokal
+const icon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+})
+
+interface FoodSpot {
+  id: number
+  name: string
+  category: string
+  address: string
+  lat: number
+  lng: number
+  items: string
+  status: string
+  price: string
 }
 
-export default function OSMMapToko() {
-  const [isMounted, setIsMounted] = useState(false)
+interface OSMMapTokoProps {
+  data: FoodSpot[]
+}
 
-  useEffect(() => {
-    fixLeafletIcon()
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) {
-    return (
-      <div className="flex h-100 w-full items-center justify-center rounded-xl border bg-muted">
-        <p className="text-muted-foreground">Memuat Peta...</p>
-      </div>
-    )
-  }
-
-  const center: [number, number] = [-7.055466276786032, 110.43521145952651] // Koordinat Toko
-  const markerPos: [number, number] = [-7.055466276786032, 110.43521145952651] // Lokasi Toko
+export default function OSMMapToko({ data }: OSMMapTokoProps) {
+  const center: [number, number] = [-6.966667, 110.416664]
 
   return (
-    <div className="h-100 w-full overflow-hidden rounded-xl border shadow-lg">
-      <MapContainer center={center} zoom={12} scrollWheelZoom={false} className="size-full">
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={markerPos}>
+    <MapContainer center={center} zoom={12} scrollWheelZoom={false} className="h-125 w-full rounded-xl z-0">
+      <TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+      {data.map(spot => (
+        <Marker
+          key={spot.id}
+          position={[spot.lat, spot.lng]}
+          icon={icon} // <--- PERBAIKAN 2: Jangan lupa pasang props icon ini!
+        >
           <Popup>
-            <div className="text-center">
-              <h3 className="font-bold">Foster Coffee</h3>
-              <p className="text-xs text-muted-foreground">coffee shop kalcer untuk semua kalangan</p>
+            <div className="p-1 min-w-50">
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded border border-green-400">
+                {spot.category}
+              </span>
+
+              <h3 className="font-bold text-sm mt-2">{spot.name}</h3>
+              <p className="text-xs text-gray-500 mb-2">{spot.address}</p>
+
+              {/* <button className="w-full mt-2 bg-blue-600 text-white text-xs py-1 px-2 rounded hover:bg-blue-700">
+                Lihat Detail
+              </button> */}
             </div>
           </Popup>
         </Marker>
-      </MapContainer>
-    </div>
+      ))}
+    </MapContainer>
   )
 }

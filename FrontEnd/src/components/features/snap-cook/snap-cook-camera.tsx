@@ -7,8 +7,8 @@ import { Card } from "@/components/ui/card"
 import { captureFromVideo } from "@/lib/image-utils"
 
 interface SnapCookCameraProps {
-    onCapture: (image: File) => void
-    disabled?: boolean
+  onCapture: (image: File) => void
+  disabled?: boolean
 }
 
 export function SnapCookCamera({ onCapture, disabled }: SnapCookCameraProps) {
@@ -101,14 +101,14 @@ export function SnapCookCamera({ onCapture, disabled }: SnapCookCameraProps) {
         }
     }, [stream, isCameraActive])
 
-    // Stop camera
-    const stopCamera = useCallback(() => {
-        if (stream) {
-            stream.getTracks().forEach((track) => track.stop())
-            setStream(null)
-            setIsCameraActive(false)
-        }
-    }, [stream])
+  // Stop camera
+  const stopCamera = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop())
+      setStream(null)
+      setIsCameraActive(false)
+    }
+  }, [stream])
 
     // Capture photo from camera
     const capturePhoto = useCallback(async () => {

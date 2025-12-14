@@ -1,11 +1,15 @@
 // --- CONFIG API ---
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'
 
 // --- DAFTAR ENDPOINT (Kamus URL) ---
 export const ENDPOINTS = {
   // AUTH
-  LOGIN: '/auth/login',
-  REGISTER: '/auth/register',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  LOGOUT: '/logout',
+
+  // SELLER
+  CREATE_SELLER: '/seller/', // POST
 
   // MARKETPLACE
   PRODUCTS: '/products', // <-- Nanti uncomment ini kalo Golang udah ready
@@ -18,5 +22,5 @@ export const ENDPOINTS = {
   PRODUCT_DETAIL: (id: string) => `/products/${id}`, // Dynamic URL
 
   // TRANSACTION
-  CHECKOUT: '/transactions/checkout',
+  // CHECKOUT: '/transactions/checkout',
 }

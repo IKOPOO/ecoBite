@@ -11,31 +11,59 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LeafIcon, EyeIcon, EyeOffIcon, StoreIcon, ShoppingBagIcon, ArrowLeftIcon } from "@/components/shared/icons"
 import BackButton from "@/components/shared/back-button"
+import { useRegister } from "@/hooks/use-auth"
+import { RegisterFormValues, RegisterSchema } from "@/services/auth-service"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Loader2, ShoppingBag, Store } from "lucide-react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 type UserRole = "buyer" | "seller"
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const initialRole = searchParams.get("role") as UserRole | null
+  // const router = useRouter()
+  // const searchParams = useSearchParams()
+  // const initialRole = searchParams.get("role") as UserRole | null
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [role, setRole] = useState<UserRole>(initialRole || "buyer")
-  const [isLoading, setIsLoading] = useState(false)
+  // const [showPassword, setShowPassword] = useState(false)
+  // const [role, setRole] = useState<UserRole>(initialRole || "buyer")
+  // const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+  // // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // //   e.preventDefault()
+  // //   setIsLoading(true)
 
-    // Simulate registration
-    await new Promise(resolve => setTimeout(resolve, 1000))
+  // //   // Simulate registration
+  // //   await new Promise(resolve => setTimeout(resolve, 1000))
 
-    // Redirect based on role
-    if (role === "buyer") {
-      router.push("/marketplace")
-    } else {
-      router.push("/seller/dashboard")
-    }
+  // //   // Redirect based on role
+  // //   if (role === "buyer") {
+  // //     router.push("/marketplace")
+  // //   } else {
+  // //     router.push("/seller/dashboard")
+  // //   }
+  // // }
+
+  // 1. Panggil Hook Mutasi
+  const { mutate, isPending } = useRegister()
+
+  // 2. Setup Form dengan Zod Resolver
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterSchema),
+    defaultValues: {
+      fullName: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "buyer", // Default role
+    },
+  })
+
+  // 3. Handler Submit
+  const onSubmit = (data: RegisterFormValues) => {
+    mutate(data) // Kirim data ke hook -> service -> backend
   }
 
   return (
@@ -43,103 +71,149 @@ export default function RegisterPage() {
       <BackButton className="absolute left-4 top-4 z-10" label="Kembali" />
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
-          <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-16 w-auto" />
+          <Link href="/" className="mx-auto my-4 flex items-center gap-2 w-32 h-20">
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="w-full" />
           </Link>
           <CardTitle className="text-2xl">Buat Akun Baru</CardTitle>
           <CardDescription>Bergabung dengan komunitas food rescue</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Role Selector */}
-            <div className="space-y-2">
-              <Label>Daftar Sebagai</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole("buyer")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "buyer" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                    }`}
-                >
-                  <div
-                    className={`flex size-12 items-center justify-center rounded-full ${role === "buyer" ? "bg-primary/10" : "bg-muted"
-                      }`}
-                  >
-                    <ShoppingBagIcon
-                      className={`size-6 ${role === "buyer" ? "text-primary" : "text-muted-foreground"}`}
-                    />
-                  </div>
-                  <span className={`font-medium ${role === "buyer" ? "text-primary" : ""}`}>Pembeli</span>
-                  <span className="text-xs text-muted-foreground">Beli makanan hemat</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("seller")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "seller" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                    }`}
-                >
-                  <div
-                    className={`flex size-12 items-center justify-center rounded-full ${role === "seller" ? "bg-primary/10" : "bg-muted"
-                      }`}
-                  >
-                    <StoreIcon className={`size-6 ${role === "seller" ? "text-primary" : "text-muted-foreground"}`} />
-                  </div>
-                  <span className={`font-medium ${role === "seller" ? "text-primary" : ""}`}>Penjual</span>
-                  <span className="text-xs text-muted-foreground">Jual makanan Anda</span>
-                </button>
-              </div>
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* --- PILIH ROLE (Radio Cards) --- */}
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Saya ingin mendaftar sebagai...</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="grid grid-cols-2 gap-4"
+                      >
+                        {/* Pilihan Pembeli */}
+                        <div>
+                          <RadioGroupItem value="buyer" id="buyer" className="peer sr-only" />
+                          <Label
+                            htmlFor="buyer"
+                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
+                          >
+                            <ShoppingBag className="mb-2 size-6 text-primary" />
+                            Pembeli
+                          </Label>
+                        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="name">Nama</Label>
-              <Input id="name" type="text" placeholder="Masukkan nama anda" required />
-            </div>
+                        {/* Pilihan Penjual */}
+                        <div>
+                          <RadioGroupItem value="seller" id="seller" className="peer sr-only" />
+                          <Label
+                            htmlFor="seller"
+                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
+                          >
+                            <Store className="mb-2 size-6 text-primary" />
+                            Mitra Penjual
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" type="text" placeholder="Masukkan username" required />
-            </div>
+              {/* --- NAMA LENGKAP --- */}
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nama Lengkap</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contoh: Budi Santoso" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="nama@email.com" required />
-            </div>
+              {/* --- USERNAME --- */}
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contoh: budi_ganteng123" autoComplete="username" {...field} />
+                    </FormControl>
+                    <p className="text-[0.8rem] text-muted-foreground">Username unik untuk profil kamu.</p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Minimal 8 karakter"
-                  required
+              {/* --- EMAIL --- */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="budi@contoh.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {/* --- PASSWORD --- */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOffIcon className="size-5" /> : <EyeIcon className="size-5" />}
-                </button>
+
+                {/* --- CONFIRM PASSWORD --- */}
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Konfirmasi Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Memproses..." : "Daftar"}
-            </Button>
-
-            <p className="text-center text-xs text-muted-foreground">
-              Dengan mendaftar, Anda menyetujui{" "}
-              <Link href="/terms" className="text-primary hover:underline">
-                Syarat & Ketentuan
-              </Link>{" "}
-              dan{" "}
-              <Link href="/privacy" className="text-primary hover:underline">
-                Kebijakan Privasi
-              </Link>{" "}
-              kami.
-            </p>
-          </form>
+              {/* --- TOMBOL SUBMIT --- */}
+              <Button className="w-full" size="lg" type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Mendaftarkan...
+                  </>
+                ) : (
+                  "Buat Akun"
+                )}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-6 text-center text-sm">
             Sudah punya akun?{" "}

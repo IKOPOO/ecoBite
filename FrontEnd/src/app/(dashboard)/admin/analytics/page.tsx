@@ -37,7 +37,7 @@ function formatRupiah(amount: number) {
 }
 
 export default function AdminAnalyticsPage() {
-  const maxRevenue = Math.max(...monthlyData.map((d) => d.revenue))
+  const maxRevenue = Math.max(...monthlyData.map(d => d.revenue))
 
   return (
     <div className="space-y-6">
@@ -100,7 +100,7 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Sustainability Impact */}
-      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+      <Card className="bg-linear-to-r from-green-50 to-emerald-50 border-green-200">
         <CardContent className="p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
@@ -143,7 +143,7 @@ export default function AdminAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {monthlyData.map((data) => (
+              {monthlyData.map(data => (
                 <div key={data.month} className="flex items-center gap-4">
                   <span className="w-10 text-sm font-medium">{data.month}</span>
                   <div className="flex-1">
@@ -193,7 +193,7 @@ export default function AdminAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex h-8 overflow-hidden rounded-lg">
-              {categoryDistribution.map((cat) => (
+              {categoryDistribution.map(cat => (
                 <div
                   key={cat.category}
                   className={`${cat.color} transition-all`}
@@ -202,7 +202,7 @@ export default function AdminAnalyticsPage() {
               ))}
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-5">
-              {categoryDistribution.map((cat) => (
+              {categoryDistribution.map(cat => (
                 <div key={cat.category} className="flex items-center gap-2">
                   <div className={`h-3 w-3 rounded-full ${cat.color}`} />
                   <div>
