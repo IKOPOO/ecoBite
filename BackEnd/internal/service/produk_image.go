@@ -4,7 +4,6 @@ import (
 	env "ecobite/internal/config"
 	"ecobite/internal/database/model"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -12,6 +11,9 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type ProdukImageService struct {
@@ -21,6 +23,18 @@ type ProdukImageService struct {
 func NewProdukImageService(m *model.ProductImagesModel) *ProdukImageService {
 	return &ProdukImageService{Model: m}
 }
+
+type validateFile struct {
+	Fileheader *multipart.FileHeader
+	MimeType   string
+	Folder     string
+	fileSize   int64
+}
+
+const (
+	maxUploadSize = 20 << 20 // 20mb
+	maxFileSize   = 5 << 20  // 5mb
+)
 
 // check if file is valid or not
 func isValidFile(file multipart.File) (bool, string) {
@@ -135,4 +149,119 @@ func (m *ProdukImageService) UploadSingleImage(files *multipart.FileHeader) (*mo
 	}
 
 	return uploadedFile, nil
+}
+
+// service for uploading image or video to storage and insert to database
+func (m *ProductService) UploadImage(files []*multipart.FileHeader) ([]*model.ProductInsert, error) {
+	env.LoadEnv()
+	// get the storage path
+	storagePath := os.Getenv("STORAGE_PATH")
+	if storagePath == "" {
+		storagePath = "storage/uploads"
+	}
+
+	// validasi -> cek total semua file dan file size, cek file type
+	var (
+		totalSize    int64
+		validateData []validateFile
+	)
+
+	for _, fileHeader := range files {
+		// sum total size file upload
+		totalSize += fileHeader.Size
+
+		// check size per file
+		if fileHeader.Size > maxFileSize {
+			return nil, fmt.Errorf("file size is too large, tf nigga")
+		}
+
+		file, err := fileHeader.Open()
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse multipart form: %s", fileHeader.Filename)
+		}
+		defer file.Close()
+
+		//check if the file is valid and allowed or not
+		isvalid, mimeType := isValidFile(file)
+		if !isvalid {
+			return nil, fmt.Errorf("file type not allowed, hayoo script apa ituuu")
+		}
+
+		// save the file base on mimetype
+		var folder string
+		switch {
+		case strings.HasPrefix(mimeType, "image"):
+			folder = "image"
+
+		case strings.HasPrefix(mimeType, "video"):
+			folder = "video"
+		default:
+			return nil, fmt.Errorf("failed to save file")
+		}
+
+		validateData = append(validateData, validateFile{
+			Fileheader: fileHeader,
+			MimeType:   mimeType,
+			Folder:     folder,
+			fileSize:   fileHeader.Size,
+		})
+	}
+
+	// save all the file
+	var uploadedFile []*model.ProductInsert
+	for _, file := range validateData {
+		// make sure the storage folder exists
+		dirPath := filepath.Join(storagePath, file.Folder)
+		if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+			return nil, fmt.Errorf("Failed to create storage folder")
+		}
+
+		// make random name file
+		newFileName := GenerateRandomName(file.Fileheader.Filename)
+		fmt.Println(newFileName)
+
+		// save the fuckin file
+		savePath := filepath.Join(dirPath, newFileName)
+		if err := SaveUploadedFile(file.Fileheader, savePath); err != nil {
+			return nil, fmt.Errorf("Failed to save file")
+		}
+
+		uploadedFile = append(uploadedFile, &model.ProductInsert{
+			ImageURL: savePath,
+		})
+	}
+
+	return uploadedFile, nil
+}
+
+// func save photo to gallery dan insert to database -> multiple file
+func (m *ProductService) UploadAndInsertGallery(files []*multipart.FileHeader, gallery *model.ProductImage) ([]*model.ProductImageResponse, error) {
+	// upload file first
+	uploadedFile, err := m.UploadImage(files)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to upload file to storage")
+	}
+
+	// insert to database
+	result := []*model.ProductImageResponse{}
+	for _, files := range uploadedFile {
+		file_upload := &model.ProductImage{
+			ProductID: gallery.ProductID,
+			ImageURL:  files.ImageURL,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		fileUpload, err := m.ProdukImage.Model.InsertImages(file_upload)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to insert data")
+		}
+
+		result = append(result, &model.ProductImageResponse{
+			ID:        fileUpload.ID,
+			ImageURL:  fileUpload.ImageURL,
+			CreatedAt: fileUpload.CreatedAt,
+		})
+	}
+	return result, nil
 }
