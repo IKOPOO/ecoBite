@@ -144,7 +144,7 @@ export default function LandingPage() {
                   makanan berkualitas dengan harga hemat.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
-                  <Link href="/marketplace">
+                  <Link href="/buyer/marketplace">
                     <Button size="lg" variant="secondary" className="gap-2">
                       Jelajahi Marketplace
                       <ChevronRightIcon className="size-4" />

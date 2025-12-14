@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, ShoppingBag, AlertCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { SnapCookCamera } from "@/components/features/snap-cook/snap-cook-camera"
 import { ChefSavorBite } from "@/components/features/snap-cook/chef-savorbite"
 import { RecipeRecommendation } from "@/components/features/snap-cook/recipe-recommendation"
@@ -21,8 +23,19 @@ export default function SnapCookPage() {
     const [error, setError] = useState<string>("")
     const [recipe, setRecipe] = useState<ChefSavorBiteResponse | null>(null)
     const [capturedImage, setCapturedImage] = useState<string>("")
+    const [useCartMode, setUseCartMode] = useState(true) // true = with cart, false = camera only
+
+    // Prevent duplicate API calls (React StrictMode double-render protection)
+    const isProcessingRef = useRef(false)
 
     const handleImageCapture = async (image: File) => {
+        // Prevent duplicate calls
+        if (isProcessingRef.current) {
+            console.log("⚠️ Duplicate API call prevented (React StrictMode)")
+            return
+        }
+
+        isProcessingRef.current = true
         setIsAnalyzing(true)
         setError("")
         setRecipe(null)
@@ -34,7 +47,7 @@ export default function SnapCookPage() {
         try {
             const result = await getRecipeRecommendation({
                 image,
-                cartItems,
+                cartItems: useCartMode ? cartItems : [], // Only pass cart if mode is enabled
             })
 
             if (result.success && result.data) {
@@ -47,6 +60,8 @@ export default function SnapCookPage() {
             setError("Terjadi kesalahan. Silakan coba lagi.")
         } finally {
             setIsAnalyzing(false)
+            // Allow next request after completion
+            isProcessingRef.current = false
         }
     }
 
@@ -101,8 +116,36 @@ export default function SnapCookPage() {
                                 Kamu punya {cartItems.length} item di keranjang
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                Chef SavorBite akan merekomendasikan resep yang sesuai!
+                                {useCartMode
+                                    ? "Chef SavorBite akan merekomendasikan resep yang sesuai!"
+                                    : "Mode hanya kamera aktif - cart tidak digunakan"}
                             </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Mode Selection Toggle */}
+            {!recipe && (
+                <Card className="mb-6">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                                <Label htmlFor="cart-mode" className="text-sm font-medium">
+                                    {useCartMode ? "🛒 Mode: Kamera + Keranjang" : "📸 Mode: Kamera Saja"}
+                                </Label>
+                                <p className="text-xs text-muted-foreground">
+                                    {useCartMode
+                                        ? "Resep akan menggunakan bahan dari kamera dan keranjang"
+                                        : "Resep hanya dari bahan yang terdeteksi di kamera"}
+                                </p>
+                            </div>
+                            <Switch
+                                id="cart-mode"
+                                checked={useCartMode}
+                                onCheckedChange={setUseCartMode}
+                                disabled={isAnalyzing}
+                            />
                         </div>
                     </CardContent>
                 </Card>

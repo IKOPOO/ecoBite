@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import { Camera, Upload, X, RefreshCw } from "lucide-react"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { Camera, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { captureFromVideo, validateImage } from "@/lib/image-utils"
+import { captureFromVideo } from "@/lib/image-utils"
 
 interface SnapCookCameraProps {
     onCapture: (image: File) => void
@@ -15,32 +15,91 @@ export function SnapCookCamera({ onCapture, disabled }: SnapCookCameraProps) {
     const [stream, setStream] = useState<MediaStream | null>(null)
     const [error, setError] = useState<string>("")
     const [isCameraActive, setIsCameraActive] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const videoRef = useRef<HTMLVideoElement>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Start camera automatically on mount
+    useEffect(() => {
+        console.log("🎥 Snap & Cook: Starting camera...")
+        startCamera()
+        return () => {
+            console.log("🎥 Snap & Cook: Cleaning up camera...")
+            stopCamera()
+        }
+    }, [])
 
     // Start camera
     const startCamera = useCallback(async () => {
         try {
+            console.log("🎥 Requesting camera permission...")
             setError("")
+            setIsLoading(true)
+
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" }, // Use back camera on mobile
+                video: {
+                    facingMode: "environment",
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                },
                 audio: false,
             })
 
-            if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream
-                await videoRef.current.play()
-            }
-
+            console.log("✅ Camera permission granted!")
             setStream(mediaStream)
             setIsCameraActive(true)
-        } catch (err) {
-            console.error("Camera error:", err)
-            setError(
-                "Tidak dapat mengakses kamera. Pastikan Anda memberikan izin akses kamera atau gunakan upload foto."
-            )
+            setIsLoading(false)
+        } catch (err: any) {
+            console.error("❌ Camera error:", err)
+            setIsLoading(false)
+
+            let errorMessage = "Tidak dapat mengakses kamera. "
+
+            if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                errorMessage = "🚫 Akses kamera ditolak. Silakan klik ikon kamera di address bar dan izinkan akses kamera."
+            } else if (err.name === "NotFoundError") {
+                errorMessage = "📷 Kamera tidak ditemukan. Pastikan device memiliki kamera."
+            } else if (err.name === "NotReadableError") {
+                errorMessage = "⚠️ Kamera sedang digunakan aplikasi lain. Tutup aplikasi lain yang menggunakan kamera."
+            } else {
+                errorMessage = `❌ Error: ${err.message || 'Unknown error'}`
+            }
+
+            setError(errorMessage)
         }
     }, [])
+
+    // Attach stream to video element when ready
+    useEffect(() => {
+        if (stream && videoRef.current && isCameraActive) {
+            console.log("🔗 Attaching stream to video element...")
+            const video = videoRef.current
+            video.srcObject = stream
+
+            const playVideo = async () => {
+                try {
+                    // Wait for metadata
+                    if (video.readyState < 2) {
+                        await new Promise((resolve) => {
+                            const onLoadedMetadata = () => {
+                                video.removeEventListener('loadedmetadata', onLoadedMetadata)
+                                resolve(true)
+                            }
+                            video.addEventListener('loadedmetadata', onLoadedMetadata)
+                            // Fallback
+                            setTimeout(resolve, 2000)
+                        })
+                    }
+
+                    await video.play()
+                    console.log("▶️ Video playing successfully")
+                } catch (e) {
+                    console.error("❌ Error playing video:", e)
+                }
+            }
+
+            playVideo()
+        }
+    }, [stream, isCameraActive])
 
     // Stop camera
     const stopCamera = useCallback(() => {
@@ -53,47 +112,34 @@ export function SnapCookCamera({ onCapture, disabled }: SnapCookCameraProps) {
 
     // Capture photo from camera
     const capturePhoto = useCallback(async () => {
-        if (!videoRef.current) return
+        if (!videoRef.current) {
+            setError("Video tidak tersedia")
+            return
+        }
+
+        // Check if video is ready
+        if (videoRef.current.readyState < 2) {
+            setError("Video belum siap. Tunggu sebentar...")
+            return
+        }
 
         try {
+            console.log("📸 Capturing photo...")
             const file = await captureFromVideo(videoRef.current)
+            console.log("✅ Photo captured successfully!")
             onCapture(file)
             stopCamera()
-        } catch (err) {
-            console.error("Capture error:", err)
-            setError("Gagal mengambil foto. Silakan coba lagi.")
+        } catch (err: any) {
+            console.error("❌ Capture error:", err)
+            setError(err.message || "Gagal mengambil foto. Silakan coba lagi.")
         }
     }, [onCapture, stopCamera])
 
-    // Handle file upload
-    const handleFileUpload = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0]
-            if (!file) return
-
-            const validation = validateImage(file)
-            if (!validation.valid) {
-                setError(validation.error || "File tidak valid")
-                return
-            }
-
-            setError("")
-            onCapture(file)
-        },
-        [onCapture]
-    )
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            stopCamera()
-        }
-    }, [stopCamera])
-
     return (
         <div className="space-y-4">
-            <Card className="overflow-hidden border-2 border-dashed">
-                <div className="relative aspect-[4/3] bg-muted">
+            {/* Camera Preview */}
+            <Card className="overflow-hidden border-2 border-primary">
+                <div className="relative aspect-[4/3] bg-black">
                     {isCameraActive ? (
                         <>
                             <video
@@ -103,90 +149,82 @@ export function SnapCookCamera({ onCapture, disabled }: SnapCookCameraProps) {
                                 muted
                                 className="size-full object-cover"
                             />
+                            {/* Camera Frame Guide */}
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="absolute inset-8 rounded-2xl border-4 border-primary/30" />
+                                <div className="absolute inset-8 rounded-2xl border-4 border-white/50" />
                             </div>
                         </>
-                    ) : (
+                    ) : isLoading ? (
                         <div className="flex size-full flex-col items-center justify-center p-8 text-center">
-                            <div className="mb-4 rounded-full bg-primary/10 p-6">
+                            <div className="mb-4 animate-pulse rounded-full bg-primary/10 p-6">
                                 <Camera className="size-12 text-primary" />
                             </div>
-                            <h3 className="mb-2 text-lg font-semibold">
-                                Foto Bahan Makananmu!
-                            </h3>
-                            <p className="mb-6 text-sm text-muted-foreground">
-                                Ambil foto kulkas atau bahan makanan yang kamu punya, dan Chef
-                                SavorBite akan kasih rekomendasi resep
+                            <p className="text-sm font-semibold text-white mb-2">
+                                Meminta izin kamera...
+                            </p>
+                            <p className="text-xs text-white/60">
+                                Klik "Allow" jika browser menanyakan permission
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex size-full flex-col items-center justify-center p-8 text-center">
+                            <div className="mb-4 rounded-full bg-destructive/10 p-6">
+                                <Camera className="size-12 text-destructive" />
+                            </div>
+                            <p className="text-sm text-white/80">
+                                Kamera tidak aktif
                             </p>
                         </div>
                     )}
                 </div>
             </Card>
 
+            {/* Error Message */}
             {error && (
                 <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
-                    {error}
+                    <p className="font-semibold mb-1">⚠️ Error</p>
+                    <p>{error}</p>
+                    <Button
+                        onClick={startCamera}
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                    >
+                        Coba Lagi
+                    </Button>
                 </div>
             )}
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-                {!isCameraActive ? (
-                    <>
-                        <Button
-                            onClick={startCamera}
-                            disabled={disabled}
-                            className="flex-1 gap-2"
-                            size="lg"
-                        >
-                            <Camera className="size-5" />
-                            Buka Kamera
-                        </Button>
-                        <Button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={disabled}
-                            variant="outline"
-                            className="flex-1 gap-2"
-                            size="lg"
-                        >
-                            <Upload className="size-5" />
-                            Upload Foto
-                        </Button>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                        />
-                    </>
-                ) : (
-                    <>
-                        <Button
-                            onClick={capturePhoto}
-                            disabled={disabled}
-                            className="flex-1 gap-2"
-                            size="lg"
-                        >
-                            <Camera className="size-5" />
-                            Ambil Foto
-                        </Button>
-                        <Button
-                            onClick={stopCamera}
-                            disabled={disabled}
-                            variant="outline"
-                            className="gap-2"
-                            size="lg"
-                        >
-                            <X className="size-5" />
-                            Batal
-                        </Button>
-                    </>
-                )}
-            </div>
+            {/* Action Buttons */}
+            {isCameraActive && (
+                <div className="flex gap-3">
+                    <Button
+                        onClick={capturePhoto}
+                        disabled={disabled}
+                        className="flex-1 gap-2 h-14"
+                        size="lg"
+                    >
+                        <Camera className="size-5" />
+                        Ambil Foto
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            stopCamera()
+                            startCamera()
+                        }}
+                        disabled={disabled}
+                        variant="outline"
+                        className="gap-2 h-14"
+                        size="lg"
+                    >
+                        <X className="size-5" />
+                        Reset
+                    </Button>
+                </div>
+            )}
 
             <p className="text-center text-xs text-muted-foreground">
-                💡 Tips: Pastikan pencahayaan cukup dan bahan makanan terlihat jelas
+                📸 Posisikan bahan makanan di dalam frame putih
             </p>
         </div>
     )

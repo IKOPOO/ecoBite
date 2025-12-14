@@ -151,32 +151,62 @@ export function captureFromVideo(
     videoElement: HTMLVideoElement,
     filename: string = 'camera-capture.jpg'
 ): Promise<File> {
-    const canvas = document.createElement('canvas')
-    canvas.width = videoElement.videoWidth
-    canvas.height = videoElement.videoHeight
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-        throw new Error('Could not get canvas context')
-    }
-
-    ctx.drawImage(videoElement, 0, 0)
-
     return new Promise((resolve, reject) => {
-        canvas.toBlob(
-            (blob) => {
-                if (!blob) {
-                    reject(new Error('Could not create blob from canvas'))
-                    return
-                }
-                const file = new File([blob], filename, {
-                    type: 'image/jpeg',
-                    lastModified: Date.now(),
-                })
-                resolve(file)
-            },
-            'image/jpeg',
-            0.9
-        )
+        // Validate video element
+        if (!videoElement) {
+            reject(new Error('Video element is null'))
+            return
+        }
+
+        if (videoElement.readyState < 2) {
+            reject(new Error('Video not ready. Please wait for camera to load.'))
+            return
+        }
+
+        if (videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+            reject(new Error('Video has no dimensions. Camera may not be active.'))
+            return
+        }
+
+        try {
+            const canvas = document.createElement('canvas')
+            canvas.width = videoElement.videoWidth
+            canvas.height = videoElement.videoHeight
+
+            const ctx = canvas.getContext('2d')
+            if (!ctx) {
+                reject(new Error('Could not get canvas context'))
+                return
+            }
+
+            // Draw current video frame to canvas
+            ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height)
+
+            // Convert to blob with higher quality
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        reject(new Error('Failed to create image. Please try again.'))
+                        return
+                    }
+
+                    const file = new File([blob], filename, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now(),
+                    })
+
+                    console.log('✅ Photo captured:', {
+                        size: `${(file.size / 1024).toFixed(2)} KB`,
+                        dimensions: `${canvas.width}x${canvas.height}`
+                    })
+
+                    resolve(file)
+                },
+                'image/jpeg',
+                0.95 // Higher quality
+            )
+        } catch (error) {
+            reject(error)
+        }
     })
 }
