@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Header } from "@/components/layouts/header"
@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronRightIcon, MapPinIcon, TruckIcon, PackageIcon, LeafIcon } from "@/components/shared/icons"
 import { useCart } from "@/providers/cart-provider"
+import { useOrder } from "@/providers/order-provider" // 1. Import useOrder
 import { formatPrice } from "@/lib/data"
 import { toast } from "sonner"
 
@@ -22,6 +23,8 @@ type PaymentMethod = "qris" | "cod" | "ewallet"
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, subtotal, clearCart, totalItems } = useCart()
+  const { addOrder } = useOrder() // 2. Panggil hook order
+
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("pickup")
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("qris")
   const [couponCode, setCouponCode] = useState("")
@@ -31,33 +34,44 @@ export default function CheckoutPage() {
   const total = subtotal + deliveryFee
   const totalFoodWasteSaved = items.reduce((acc, item) => acc + item.product.foodWasteSaved * item.quantity, 0)
 
+  // Redirect kalau user akses checkout tapi cart kosong
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/buyer/cart")
+    }
+  }, [items, router]) // Dijalankan tiap kali items berubah
+
+  // Tetap return null biar halaman checkout gak sempat muncul (nge-glitch)
   if (items.length === 0) {
-    router.push("/buyer/cart")
     return null
   }
 
   const handlePlaceOrder = async () => {
     setIsLoading(true)
 
-    // Show processing toast
     toast.loading("Memproses pembayaran...")
 
-    // Simulate payment processing (1.5 seconds)
+    // Simulasi delay proses
     await new Promise(resolve => setTimeout(resolve, 1500))
 
-    // 90% success rate for dummy payment
-    const success = Math.random() > 0.1
-
+    const success = Math.random() > 0.1 // 90% chance success
     toast.dismiss()
 
     if (success) {
-      // Success
+      // 3. EKSEKUSI FINAL DISINI
+
+      // a. Masukkan ke database order
+      // (Kita kirim total akhir termasuk ongkir)
+      addOrder(items, total)
+
+      // b. Kosongkan keranjang
+      clearCart()
+
+      // c. Redirect ke halaman sukses
       const orderId = `ORD-${Date.now()}`
       toast.success("Pembayaran berhasil!")
-      clearCart()
       router.push(`/buyer/orders?success=true&order_id=${orderId}`)
     } else {
-      // Failure  
       toast.error("Pembayaran gagal. Silakan coba lagi.")
       setIsLoading(false)
     }
@@ -99,8 +113,9 @@ export default function CheckoutPage() {
                   >
                     <Label
                       htmlFor="pickup"
-                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${deliveryMethod === "pickup" ? "border-primary bg-primary/5" : "hover:bg-muted"
-                        }`}
+                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
+                        deliveryMethod === "pickup" ? "border-primary bg-primary/5" : "hover:bg-muted"
+                      }`}
                     >
                       <RadioGroupItem value="pickup" id="pickup" />
                       <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
@@ -113,8 +128,9 @@ export default function CheckoutPage() {
                     </Label>
                     <Label
                       htmlFor="delivery"
-                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${deliveryMethod === "delivery" ? "border-primary bg-primary/5" : "hover:bg-muted"
-                        }`}
+                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
+                        deliveryMethod === "delivery" ? "border-primary bg-primary/5" : "hover:bg-muted"
+                      }`}
                     >
                       <RadioGroupItem value="delivery" id="delivery" />
                       <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
@@ -129,13 +145,12 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Address - Show only for delivery */}
+              {/* Address Form (Jika Delivery) */}
               {deliveryMethod === "delivery" && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
-                      <MapPinIcon className="size-5" />
-                      Alamat Pengiriman
+                      <MapPinIcon className="size-5" /> Alamat Pengiriman
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -176,8 +191,9 @@ export default function CheckoutPage() {
                       <Label
                         key={method.value}
                         htmlFor={method.value}
-                        className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${paymentMethod === method.value ? "border-primary bg-primary/5" : "hover:bg-muted"
-                          }`}
+                        className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
+                          paymentMethod === method.value ? "border-primary bg-primary/5" : "hover:bg-muted"
+                        }`}
                       >
                         <RadioGroupItem value={method.value} id={method.value} />
                         <div>
@@ -190,7 +206,7 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Coupon */}
+              {/* Kupon */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Kupon Diskon</CardTitle>
@@ -210,14 +226,13 @@ export default function CheckoutPage() {
               </Card>
             </div>
 
-            {/* Order Summary */}
+            {/* Summary Sticky */}
             <div>
               <Card className="sticky top-20">
                 <CardHeader>
                   <CardTitle>Ringkasan Pesanan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Items */}
                   <div className="max-h-48 space-y-3 overflow-y-auto">
                     {items.map(item => (
                       <div key={item.product.id} className="flex gap-3">
@@ -257,7 +272,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Sustainability Info */}
                   <div className="flex items-center gap-2 rounded-lg bg-primary/5 p-3">
                     <LeafIcon className="size-5 text-primary" />
                     <span className="text-sm">
@@ -276,7 +290,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   )

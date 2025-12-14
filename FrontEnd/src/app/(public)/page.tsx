@@ -80,7 +80,7 @@ export default function LandingPage() {
               <div className="relative">
                 <div className="aspect-4/3 overflow-hidden rounded-3xl">
                   <img
-                    src="/restaurant-chef-cooking-sustainable-kitchen-eco-fr.jpg"
+                    src="https://images.pexels.com/photos/5731958/pexels-photo-5731958.jpeg"
                     alt="Mitra restoran SavorBite"
                     className="size-full object-cover"
                   />
