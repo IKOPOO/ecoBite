@@ -7,10 +7,14 @@ import { z } from 'zod'
 export const RegisterSchema = z
   .object({
     fullName: z.string().min(3, 'Nama lengkap minimal 3 karakter'),
+    username: z
+      .string()
+      .min(3, 'Username minimal 3 karakter')
+      .regex(/^[a-zA-Z0-9_]+$/, 'Hanya boleh huruf, angka, dan underscore (_)'),
     email: z.string().email('Format email tidak valid'),
     password: z.string().min(8, 'Password minimal 8 karakter'),
     confirmPassword: z.string(),
-    role: z.enum(['BUYER', 'SELLER'], {
+    role: z.enum(['buyer', 'seller'], {
       required_error: 'Pilih peran Anda (Pembeli/Penjual)',
     }),
   })

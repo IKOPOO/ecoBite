@@ -53,10 +53,11 @@ export default function RegisterPage() {
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
       fullName: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
-      role: "BUYER", // Default role
+      role: "buyer", // Default role
     },
   })
 
@@ -97,7 +98,7 @@ export default function RegisterPage() {
                       >
                         {/* Pilihan Pembeli */}
                         <div>
-                          <RadioGroupItem value="BUYER" id="buyer" className="peer sr-only" />
+                          <RadioGroupItem value="buyer" id="buyer" className="peer sr-only" />
                           <Label
                             htmlFor="buyer"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
@@ -109,7 +110,7 @@ export default function RegisterPage() {
 
                         {/* Pilihan Penjual */}
                         <div>
-                          <RadioGroupItem value="SELLER" id="seller" className="peer sr-only" />
+                          <RadioGroupItem value="seller" id="seller" className="peer sr-only" />
                           <Label
                             htmlFor="seller"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
@@ -135,6 +136,22 @@ export default function RegisterPage() {
                     <FormControl>
                       <Input placeholder="Contoh: Budi Santoso" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* --- USERNAME --- */}
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Contoh: budi_ganteng123" autoComplete="username" {...field} />
+                    </FormControl>
+                    <p className="text-[0.8rem] text-muted-foreground">Username unik untuk profil kamu.</p>
                     <FormMessage />
                   </FormItem>
                 )}

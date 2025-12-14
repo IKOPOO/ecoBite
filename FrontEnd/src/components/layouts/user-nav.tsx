@@ -12,16 +12,39 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogOut, User, Settings, ShoppingBag } from "lucide-react"
+import { LogOut, User, Settings, ShoppingBag, Store } from "lucide-react"
 import Link from "next/link"
+
+interface UserData {
+  username?: string
+  fullName?: string
+  email?: string
+  role?: string
+}
 
 export function UserNav() {
   const { mutate: logout, isPending } = useLogout()
 
+  let user: UserData = {}
+  if (typeof window !== "undefined") {
+    try {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser && storedUser !== "undefined") {
+        user = JSON.parse(storedUser)
+      }
+    } catch (error) {
+      console.error("Gagal parsing data user:", error)
+      // Kalau error, hapus data korup biar ga looping error
+      localStorage.removeItem("user")
+    }
+  }
+  const userRole = user.role || "buyer"
+
   // Ambil data user dari LocalStorage buat nampilin nama (Opsional)
   // Kalau mau lebih canggih, nanti pake useQuery profile
-  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "{}") : {}
-  const initials = user.name ? user.name.slice(0, 2).toUpperCase() : "US"
+  const initials = user?.username
+    ? user.username.slice(0, 2).toUpperCase()
+    : user?.fullName?.slice(0, 2).toUpperCase() || "US"
 
   return (
     <DropdownMenu>
@@ -38,7 +61,7 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name || "Pengguna"}</p>
+            <p className="text-sm font-medium leading-none">{user.username || "Pengguna"}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email || "user@ecobite.com"}</p>
           </div>
         </DropdownMenuLabel>
@@ -46,6 +69,27 @@ export function UserNav() {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
+          {/* --- LOGIKA MENU TOKO --- */}
+          {userRole === "seller" ? (
+            // kalau udah jadi seller, arahin ke dashboard
+            <Link href="/seller">
+              <DropdownMenuItem className="cursor-pointer font-medium text-primary focus:text-primary focus:bg-primary/10">
+                <Store className="mr-2 size-4" />
+                <span>dashboard toko</span>
+              </DropdownMenuItem>
+            </Link>
+          ) : (
+            // kalau masih buyer, tawarkan buka toko
+            <Link href="/buyer/open-store">
+              <DropdownMenuItem className="cursor-pointer font-medium text-green-600 focus:text-green-700 focus:bg-green-50">
+                <Store className="mr-2 size-4" />
+                <span>buka toko gratis</span>
+              </DropdownMenuItem>
+            </Link>
+          )}
+          {/* ------------------------ */}
+
+          <DropdownMenuSeparator />
           <Link href="/buyer/profile">
             <DropdownMenuItem className="cursor-pointer">
               <User className="mr-2 size-4" />

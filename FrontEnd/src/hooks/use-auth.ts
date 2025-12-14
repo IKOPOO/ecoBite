@@ -3,6 +3,15 @@ import { authService, LoginFormValues, RegisterFormValues } from '@/services/aut
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner' // Pake toast library kamu
 import Cookies from 'js-cookie'
+import { jwtDecode } from 'jwt-decode'
+
+interface JwtPayload {
+  user_id: string
+  email: string
+  full_name: string
+  role: string
+  exp: number
+}
 
 export const useRegister = () => {
   const router = useRouter()
@@ -10,10 +19,20 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterFormValues) => authService.register(data),
 
-    onSuccess: () => {
-      toast.success('Pendaftaran Berhasil!', {
-        description: 'Silakan login dengan akun baru Anda.',
-      })
+    onSuccess: (response) => {
+      const data = response.data || response // Handle beda struktur axios
+      const { token, role, user } = data
+
+      if (token) {
+        Cookies.set('token', token, { expires: 1 })
+        Cookies.set('role', role, { expires: 1 })
+        localStorage.setItem('token', token)
+
+        // HANYA SIMPAN JIKA USER ADA DATANYA
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user))
+        }
+      }
       // Redirect ke halaman login setelah sukses
       router.push('/login')
     },
@@ -30,47 +49,65 @@ export const useRegister = () => {
 
 export const useLogin = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: LoginFormValues) => authService.login(data),
 
     onSuccess: (response) => {
-      // Asumsi respons BE kamu bentuknya:
-      // { data: { token: "abc...", role: "SELLER", user: { ... } } }
-      // Nanti sesuaikan path-nya kalau beda strukturnya.
+      const data = response.data || response
+      const { token } = data
 
-      const { token, role, user } = response.data || response
-
-      // 1. Simpan Token
-      if (token) {
-        Cookies.set('token', token, { expires: 1 }) // Expire 1 hari
-        Cookies.set('role', role, { expires: 1 }) // Buat middleware tau dia siapa
-        localStorage.setItem('token', token) // Buat Axios Interceptor
-
-        // Opsional: Simpan data user buat profil
-        localStorage.setItem('user', JSON.stringify(user))
+      if (!token) {
+        toast.error('Login Gagal', { description: 'Token tidak diterima.' })
+        return
       }
 
-      toast.success('Login Berhasil!', {
-        description: 'Selamat datang kembali di ecoBite.',
-      })
+      try {
+        // decode token
+        const decoded = jwtDecode<JwtPayload>(token)
+        const role = decoded.role ? decoded.role : 'buyer'
 
-      // 2. Redirect Sesuai Role
-      if (role === 'ADMIN') {
-        router.push('/admin')
-      } else if (role === 'SELLER') {
-        router.push('/seller')
-      } else {
-        // Buyer atau user biasa ke halaman utama
-        router.push('/')
+        // susun data user
+        const userPayload = {
+          id: decoded.user_id,
+          fullName: decoded.full_name,
+          email: decoded.email,
+          username: decoded.full_name.replace(/\s+/g, '').toLowerCase(),
+          role: role,
+        }
+
+        // simpan cookies (middleware)
+        Cookies.set('token', token, { expires: 1 })
+        Cookies.set('role', role, { expires: 1 })
+
+        // simpan localstorage (client ui)
+        localStorage.setItem('token', token)
+        localStorage.setItem('user', JSON.stringify(userPayload))
+
+        // reset cache & notifikasi
+        queryClient.clear()
+
+        toast.success('Login Berhasil!', {
+          description: 'Selamat datang kembali!',
+        })
+
+        // redirect sesuai role
+        if (role === 'seller') {
+          router.push('/seller')
+        } else if (role === 'admin') {
+          router.push('/admin')
+        } else {
+          router.push('/')
+        }
+      } catch (error) {
+        toast.error('Login Error', { description: 'Gagal memproses data login.' })
       }
     },
 
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.error || 'Email atau password salah.'
-      toast.error('Gagal Masuk', {
-        description: errorMsg,
-      })
+      const errorMsg = error.response?.data?.error || 'Gagal login.'
+      toast.error('Gagal Masuk', { description: errorMsg })
     },
   })
 }
