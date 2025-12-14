@@ -2,10 +2,22 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Package, ShoppingCart, BarChart3, Settings, Store, LogOut, Menu, X } from "lucide-react"
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  BarChart3,
+  Settings,
+  Store,
+  LogOut,
+  Menu,
+  X,
+  Loader2,
+} from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLogout } from "@/hooks/use-auth"
 
 const menuItems = [
   { href: "/seller", icon: LayoutDashboard, label: "Dashboard" },
@@ -19,6 +31,7 @@ const menuItems = [
 export function SellerSidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { mutate: logout, isPending } = useLogout()
 
   return (
     <>
@@ -39,7 +52,7 @@ export function SellerSidebar() {
       <aside
         className={cn(
           "fixed left-0 top-0 z-40 h-screen w-64 bg-card border-r transition-transform md:translate-x-0",
-          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
@@ -51,7 +64,7 @@ export function SellerSidebar() {
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
-            {menuItems.map((item) => {
+            {menuItems.map(item => {
               const isActive = pathname === item.href
               return (
                 <Link
@@ -62,7 +75,7 @@ export function SellerSidebar() {
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -81,13 +94,14 @@ export function SellerSidebar() {
                 <p className="text-xs text-muted-foreground">Verified Seller</p>
               </div>
             </div>
-            <Link
-              href="/"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            <button
+              onClick={() => logout()}
+              disabled={isPending}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <LogOut className="h-5 w-5" />
-              Keluar
-            </Link>
+              {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogOut className="h-5 w-5" />}
+              <span>{isPending ? "Sedang Keluar..." : "Keluar"}</span>
+            </button>
           </div>
         </div>
       </aside>

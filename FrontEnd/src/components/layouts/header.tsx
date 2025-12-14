@@ -88,6 +88,12 @@ export function Header({ variant = "landing" }: HeaderProps) {
               >
                 Pesanan
               </Link>
+              <Link
+                href="/buyer/snap-cook"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Snap & Cook
+              </Link>
             </>
           )}
         </nav>
