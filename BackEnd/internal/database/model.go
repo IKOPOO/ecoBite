@@ -11,6 +11,7 @@ type Models struct {
 	SellerProfile model.SellerProfileModel
 	BuyerProfile  model.BuyerProfileModel
 	Cart          model.CartModel
+	CartItem      model.CartItemModel
 	Product       model.ProductModel
 	Order         model.OrderModel
 	OrderItem     model.OrderItemModel
@@ -27,6 +28,7 @@ func NewModel(db *gorm.DB) Models {
 		SellerProfile: model.SellerProfileModel{DB: db},
 		BuyerProfile:  model.BuyerProfileModel{DB: db},
 		Cart:          model.CartModel{DB: db},
+		CartItem:      model.CartItemModel{DB: db},
 		Product:       model.ProductModel{DB: db},
 		Order:         model.OrderModel{DB: db},
 		OrderItem:     model.OrderItemModel{DB: db},
