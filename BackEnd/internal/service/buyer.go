@@ -1,6 +1,9 @@
 package service
 
-import "ecobite/internal/database/model"
+import (
+	"ecobite/internal/database/model"
+	"github.com/google/uuid"
+)
 
 type BuyerService struct {
 	Buyer       *model.BuyerProfileModel
@@ -12,4 +15,12 @@ func NewBuyerService(m *model.BuyerProfileModel, g *ProdukImageService) *BuyerSe
 		Buyer:       m,
 		ProdukImage: g,
 	}
+}
+
+func (s *BuyerService) GetBuyerProfileById(id uuid.UUID) (*model.BuyerProfile, error) {
+	var buyer model.BuyerProfile
+	if err := s.Buyer.DB.First(&buyer, "user_id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &buyer, nil
 }

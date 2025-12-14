@@ -34,6 +34,9 @@ main = "magenta"
 runner = "green"
 watcher = "cyan"
 
+[dev]
+port = "8000"
+
 [log]
 main_only = false
 silent = false
