@@ -75,7 +75,7 @@ export function UserNav() {
             <Link href="/seller">
               <DropdownMenuItem className="cursor-pointer font-medium text-primary focus:text-primary focus:bg-primary/10">
                 <Store className="mr-2 size-4" />
-                <span>dashboard toko</span>
+                <span>Dashboard Toko</span>
               </DropdownMenuItem>
             </Link>
           ) : (
@@ -83,7 +83,7 @@ export function UserNav() {
             <Link href="/buyer/open-store">
               <DropdownMenuItem className="cursor-pointer font-medium text-green-600 focus:text-green-700 focus:bg-green-50">
                 <Store className="mr-2 size-4" />
-                <span>buka toko gratis</span>
+                <span>Buka Toko Gratis</span>
               </DropdownMenuItem>
             </Link>
           )}

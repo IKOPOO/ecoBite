@@ -1,5 +1,6 @@
 import { api } from '@/lib/axios'
 import { ENDPOINTS } from '@/lib/endpoints'
+import axios from 'axios'
 import { z } from 'zod'
 
 // 1. Definisikan Bentuk Data (Schema)
@@ -61,4 +62,15 @@ export const productService = {
     const response = await api.patch(ENDPOINTS.UPDATE_PRODUCT(id), payload)
     return response.data
   },
+}
+
+export const getSellerProducts = async () => {
+  // Panggil API Route lokal yang baru kita buat
+  const response = await axios.get('/api/v1/seller/products')
+  return response.data.data
+}
+
+export const createProduct = async (productData: any) => {
+  const response = await axios.post('/api/v1/seller/products', productData)
+  return response.data
 }

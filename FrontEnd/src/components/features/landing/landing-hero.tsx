@@ -55,7 +55,7 @@ export function LandingHero() {
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
-              <Link href="/marketplace">
+              <Link href="/buyer/marketplace">
                 <Button
                   size="lg"
                   className="h-14 gap-2 rounded-full px-8 text-base shadow-lg shadow-primary/25 transition-transform hover:scale-105"

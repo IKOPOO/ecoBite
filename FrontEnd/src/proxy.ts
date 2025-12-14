@@ -6,11 +6,19 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('token')?.value
   const role = request.cookies.get('role')?.value
 
-  // --- 1. PROTEKSI HALAMAN AUTH ---
-  if (token && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
-    if (role === 'admin') return NextResponse.redirect(new URL('/admin', request.url))
-    if (role === 'seller') return NextResponse.redirect(new URL('/seller', request.url))
-    return NextResponse.redirect(new URL('/', request.url))
+  // --- 1. HANDLING USER YANG SUDAH LOGIN ---
+  // Jika sudah punya token DAN mencoba akses: Login, Register, atau Halaman Utama (/)
+  if (token && (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname === '/')) {
+    // Redirect sesuai role
+    if (role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
+    if (role === 'seller') {
+      return NextResponse.redirect(new URL('/seller', request.url))
+    }
+
+    // REQUEST KAMU: Buyer/User biasa dilempar ke marketplace
+    return NextResponse.redirect(new URL('/buyer/marketplace', request.url))
   }
 
   // --- 2. PROTEKSI HALAMAN ADMIN ---
@@ -22,17 +30,13 @@ export function proxy(request: NextRequest) {
   // --- 3. PROTEKSI HALAMAN SELLER ---
   if (pathname.startsWith('/seller')) {
     if (!token) return NextResponse.redirect(new URL('/login', request.url))
-    // admin boleh ngintip, buyer gaboleh
     if (role !== 'seller' && role !== 'admin') {
-      // kecuali halaman onboarding seller, mungkin perlu pengecualian?
-      // tapi karena onboarding url-nya /buyer/open-store, jadi aman.
       return NextResponse.redirect(new URL('/forbidden', request.url))
     }
   }
 
   // --- 4. PROTEKSI HALAMAN BUYER ---
   if (pathname.startsWith('/buyer')) {
-    // 👇 PERBAIKAN DISINI: TAMBAH TANDA SERU (!)
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
@@ -42,5 +46,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/seller/:path*', '/buyer/:path*', '/login', '/register'],
+  // PENTING: Tambahkan '/' di sini agar middleware mendeteksi halaman utama
+  matcher: ['/', '/admin/:path*', '/seller/:path*', '/buyer/:path*', '/login', '/register'],
 }
