@@ -6,6 +6,7 @@ import { NotificationProvider } from "@/providers/notification-provider"
 import { ChatProvider } from "@/providers/chat-provider"
 import { CartProvider } from "@/providers/cart-provider"
 import { Toaster } from "@/components/ui/sonner"
+import { OrderProvider } from "./order-provider"
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +14,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <NotificationProvider>
           <ChatProvider>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+              <OrderProvider>{children}</OrderProvider>
+            </CartProvider>
           </ChatProvider>
         </NotificationProvider>
       </AuthProvider>

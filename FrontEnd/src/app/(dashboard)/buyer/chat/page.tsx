@@ -1,16 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
-import { Header } from "@/components/layouts/header"
-import { Footer } from "@/components/layouts/footer"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import Image from "next/image"
 import { useChat } from "@/providers/chat-provider"
-import { MessageIcon, SearchIcon, ChevronRightIcon } from "@/components/shared/icons"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Search as SearchIcon, MessageSquare as MessageIcon, ChevronRight as ChevronRightIcon } from "lucide-react"
+import { Header } from "@/components/layouts/header" // Sesuaikan path
+import { Footer } from "@/components/layouts/footer" // Sesuaikan path
 
+// Helper function format time
 function formatTimeAgo(dateString: string) {
+  if (!dateString) return ""
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -29,14 +31,14 @@ export default function ChatListPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredConversations = conversations.filter(conv =>
-    conv.storeName.toLowerCase().includes(searchQuery.toLowerCase())
+    (conv.storeName || "").toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 flex flex-col">
       <Header variant="marketplace" />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">Pesan</h1>
           <p className="text-muted-foreground">
@@ -49,7 +51,7 @@ export default function ChatListPage() {
           <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Cari percakapan..."
-            className="pl-10"
+            className="pl-10 bg-background"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -69,38 +71,46 @@ export default function ChatListPage() {
           ) : (
             filteredConversations.map(conversation => (
               <Link key={conversation.id} href={`/buyer/chat/${conversation.id}`}>
-                <Card className="transition-colors hover:bg-muted/50">
+                <Card className="transition-colors hover:bg-muted/50 border-none shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
+                      {/* Store Image */}
                       <div className="relative shrink-0">
-                        <div className="size-12 overflow-hidden rounded-full bg-muted">
+                        <div className="size-12 overflow-hidden rounded-full bg-muted border">
                           <Image
-                            src={conversation.storeImage || "/placeholder.svg"}
+                            // Gunakan storeImage dari provider, kasih fallback placeholder kalau kosong/rusak
+                            src={
+                              conversation.storeImage?.startsWith("/") ? conversation.storeImage : "/placeholder.svg"
+                            }
                             alt={conversation.storeName}
                             width={48}
                             height={48}
                             className="size-full object-cover"
                           />
                         </div>
+                        {/* Unread Badge per Item */}
                         {conversation.unreadCount > 0 && (
-                          <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                          <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground ring-2 ring-background">
                             {conversation.unreadCount}
                           </span>
                         )}
                       </div>
 
+                      {/* Content */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <h3 className="font-medium text-foreground truncate">{conversation.storeName}</h3>
+                          {/* Gunakan storeName */}
+                          <h3 className="font-semibold text-foreground truncate">{conversation.storeName}</h3>
                           <span className="shrink-0 text-xs text-muted-foreground">
                             {formatTimeAgo(conversation.lastMessageTime)}
                           </span>
                         </div>
                         <p
                           className={`mt-0.5 text-sm truncate ${
-                            conversation.unreadCount > 0 ? "font-medium text-foreground" : "text-muted-foreground"
+                            conversation.unreadCount > 0 ? "font-bold text-foreground" : "text-muted-foreground"
                           }`}
                         >
+                          {/* Gunakan lastMessage dari provider (langsung string) */}
                           {conversation.lastMessage}
                         </p>
                       </div>

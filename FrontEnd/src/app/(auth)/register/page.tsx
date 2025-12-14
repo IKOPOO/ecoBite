@@ -71,8 +71,8 @@ export default function RegisterPage() {
       <BackButton className="absolute left-4 top-4 z-10" label="Kembali" />
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
-          <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-16 w-auto" />
+          <Link href="/" className="mx-auto my-4 flex items-center gap-2 w-32 h-20">
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="w-full" />
           </Link>
           <CardTitle className="text-2xl">Buat Akun Baru</CardTitle>
           <CardDescription>Bergabung dengan komunitas food rescue</CardDescription>
