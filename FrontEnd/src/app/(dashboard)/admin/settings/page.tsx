@@ -26,7 +26,7 @@ export default function AdminSettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold md:text-3xl">Pengaturan Platform</h1>
-        <p className="text-muted-foreground">Kelola pengaturan umum platform ecoBite</p>
+        <p className="text-muted-foreground">Kelola pengaturan umum platform SavorBite</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -252,14 +252,14 @@ export default function AdminSettingsPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="emailSubject">Subject</Label>
-              <Input id="emailSubject" defaultValue="Selamat Datang di ecoBite!" />
+              <Input id="emailSubject" defaultValue="Selamat Datang di SavorBite!" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="emailBody">Body</Label>
               <Textarea
                 id="emailBody"
                 rows={4}
-                defaultValue="Halo {{name}}, Terima kasih telah bergabung dengan ecoBite. Bersama-sama kita bisa mengurangi food waste!"
+                defaultValue="Halo {{name}}, Terima kasih telah bergabung dengan SavorBite. Bersama-sama kita bisa mengurangi food waste!"
               />
             </div>
             <Button variant="outline" className="w-full bg-transparent">

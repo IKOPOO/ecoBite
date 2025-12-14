@@ -29,7 +29,7 @@ export default function LandingPage() {
         <section id="cara-kerja" className="py-20 lg:py-32">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-16 max-w-2xl text-center">
-              <h2 className="mb-4 text-3xl font-bold lg:text-4xl">Cara Kerja ecoBite</h2>
+              <h2 className="mb-4 text-3xl font-bold lg:text-4xl">Cara Kerja SavorBite</h2>
               <p className="text-lg text-muted-foreground">
                 Tiga langkah mudah untuk mulai menyelamatkan makanan dan menghemat pengeluaran
               </p>
@@ -79,7 +79,7 @@ export default function LandingPage() {
                 <div className="aspect-4/3 overflow-hidden rounded-3xl">
                   <img
                     src="/restaurant-chef-cooking-sustainable-kitchen-eco-fr.jpg"
-                    alt="Mitra restoran ecoBite"
+                    alt="Mitra restoran SavorBite"
                     className="size-full object-cover"
                   />
                 </div>
@@ -89,7 +89,7 @@ export default function LandingPage() {
                   Bersama Mengurangi <span className="text-primary">Food Waste</span>
                 </h2>
                 <p className="text-lg text-muted-foreground">
-                  Setiap tahun, jutaan ton makanan terbuang sia-sia. ecoBite hadir sebagai solusi untuk menghubungkan
+                  Setiap tahun, jutaan ton makanan terbuang sia-sia. SavorBite hadir sebagai solusi untuk menghubungkan
                   restoran, toko roti, dan penjual makanan dengan pembeli yang menghargai kualitas dan keberlanjutan.
                 </p>
                 <div className="grid gap-6 sm:grid-cols-2">

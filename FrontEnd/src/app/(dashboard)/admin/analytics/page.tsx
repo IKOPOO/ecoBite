@@ -44,7 +44,7 @@ export default function AdminAnalyticsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold md:text-3xl">Analitik Platform</h1>
-        <p className="text-muted-foreground">Pantau performa dan pertumbuhan platform ecoBite</p>
+        <p className="text-muted-foreground">Pantau performa dan pertumbuhan platform SavorBite</p>
       </div>
 
       {/* Overview Stats */}
@@ -108,7 +108,7 @@ export default function AdminAnalyticsPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-green-800">Dampak Lingkungan Total</h3>
-              <p className="text-sm text-green-600">Kontribusi ecoBite terhadap keberlanjutan</p>
+              <p className="text-sm text-green-600">Kontribusi SavorBite terhadap keberlanjutan</p>
             </div>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-4">

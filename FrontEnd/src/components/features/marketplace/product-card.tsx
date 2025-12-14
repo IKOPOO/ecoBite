@@ -1,20 +1,39 @@
+"use client"
+
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPinIcon, ClockIcon, LeafIcon } from "@/components/shared/icons"
+import { Button } from "@/components/ui/button"
+import { MapPinIcon, ClockIcon, LeafIcon, CartIcon } from "@/components/shared/icons"
 import { type Product, formatPrice, getDaysUntilExpiry } from "@/lib/data"
+import { useCart } from "@/providers/cart-provider"
+import { toast } from "sonner"
 
 interface ProductCardProps {
   product: Product
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart()
   const daysUntilExpiry = getDaysUntilExpiry(product.expiryDate)
   const isExpiringSoon = daysUntilExpiry <= 2
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault() // Prevent navigation to detail page
+    e.stopPropagation()
+
+    if (product.stock <= 0) {
+      toast.error("Stok habis")
+      return
+    }
+
+    addToCart(product.id, 1)
+    toast.success(`${product.name} ditambahkan ke keranjang`)
+  }
+
   return (
-    <Link href={`/marketplace/${product.id}`}>
-      <Card className="group h-full overflow-hidden transition-all hover:shadow-lg">
+    <Link href={`/buyer/marketplace/${product.id}`}>
+      <Card className="group h-full overflow-hidden transition-all hover:shadow-lg flex flex-col">
         <div className="relative aspect-square overflow-hidden">
           <img
             src={product.image || "/placeholder.svg"}
@@ -42,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
         </div>
-        <CardContent className="p-4">
+        <CardContent className="flex-1 p-4">
           <h3 className="mb-1 line-clamp-1 font-semibold group-hover:text-primary">{product.name}</h3>
           <p className="mb-3 text-sm text-muted-foreground">{product.store.name}</p>
 
@@ -66,7 +85,18 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
         </CardContent>
+        <CardFooter className="p-4 pt-0">
+          <Button
+            className="w-full gap-2"
+            onClick={handleAddToCart}
+            disabled={product.stock <= 0}
+          >
+            <CartIcon className="size-4" />
+            {product.stock <= 0 ? "Stok Habis" : "Tambah ke Keranjang"}
+          </Button>
+        </CardFooter>
       </Card>
     </Link>
   )
 }
+

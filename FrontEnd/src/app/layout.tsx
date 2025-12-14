@@ -7,6 +7,7 @@ import { CartProvider } from "@/providers/cart-provider"
 import { AuthProvider } from "@/providers/auth-provider"
 import { NotificationProvider } from "@/providers/notification-provider"
 import { ChatProvider } from "@/providers/chat-provider"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -20,7 +21,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "ecoBite - Food Rescue Marketplace",
+  title: "SavorBite - Food Rescue Marketplace",
   description:
     "Kurangi Food Waste, Hemat Pengeluaran. Marketplace yang menghubungkan restoran dengan pembeli untuk menjual makanan layak konsumsi dengan harga murah.",
   generator: "v0.app",
@@ -58,6 +59,7 @@ export default function RootLayout({
             </ChatProvider>
           </NotificationProvider>
         </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>

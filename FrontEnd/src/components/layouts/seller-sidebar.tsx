@@ -45,10 +45,8 @@ export function SellerSidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b px-6">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">e</span>
-            </div>
-            <span className="text-lg font-bold">ecoBite Seller</span>
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-12 w-auto" />
+            <span className="text-lg font-bold">Seller</span>
           </div>
 
           {/* Navigation */}

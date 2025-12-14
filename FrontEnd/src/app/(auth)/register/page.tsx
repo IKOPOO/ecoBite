@@ -44,10 +44,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
-              <LeafIcon className="size-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold">ecoBite</span>
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-16 w-auto" />
           </Link>
           <CardTitle className="text-2xl">Buat Akun Baru</CardTitle>
           <CardDescription>Bergabung dengan komunitas food rescue</CardDescription>
@@ -61,14 +58,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("buyer")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${
-                    role === "buyer" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                  }`}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "buyer" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
+                    }`}
                 >
                   <div
-                    className={`flex size-12 items-center justify-center rounded-full ${
-                      role === "buyer" ? "bg-primary/10" : "bg-muted"
-                    }`}
+                    className={`flex size-12 items-center justify-center rounded-full ${role === "buyer" ? "bg-primary/10" : "bg-muted"
+                      }`}
                   >
                     <ShoppingBagIcon
                       className={`size-6 ${role === "buyer" ? "text-primary" : "text-muted-foreground"}`}
@@ -80,14 +75,12 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("seller")}
-                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${
-                    role === "seller" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
-                  }`}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors ${role === "seller" ? "border-primary bg-primary/5" : "border-border hover:bg-muted"
+                    }`}
                 >
                   <div
-                    className={`flex size-12 items-center justify-center rounded-full ${
-                      role === "seller" ? "bg-primary/10" : "bg-muted"
-                    }`}
+                    className={`flex size-12 items-center justify-center rounded-full ${role === "seller" ? "bg-primary/10" : "bg-muted"
+                      }`}
                   >
                     <StoreIcon className={`size-6 ${role === "seller" ? "text-primary" : "text-muted-foreground"}`} />
                   </div>

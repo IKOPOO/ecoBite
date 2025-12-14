@@ -41,10 +41,7 @@ export function Header({ variant = "landing" }: HeaderProps) {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-primary">
-            <LeafIcon className="size-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold text-foreground">ecoBite</span>
+          <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-14 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}
