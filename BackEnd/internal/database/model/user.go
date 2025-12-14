@@ -62,7 +62,7 @@ func (m *UserModel) FindByEmail(email string) (*User, error) {
 }
 
 // get user by id
-func (m *UserModel) GetUserById(id int) (*User, error) {
+func (m *UserModel) GetUserById(id uuid.UUID) (*User, error) {
 	var user User
 	if err := m.DB.First(&user, id).Error; err != nil {
 		return nil, err

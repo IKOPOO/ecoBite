@@ -26,6 +26,8 @@ func main() {
 	// load env
 	env.LoadEnv()
 
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	// load costum binding
 	//if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 	//v.RegisterValidation("socialurl", service.ValidateURL)

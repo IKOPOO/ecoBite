@@ -20,11 +20,21 @@ func Routes(app *config.Application) http.Handler {
 	{
 		authHandler := auth.NewUserauth(&app.Model.Users)
 
-		producService := service.NewProdukImageService(&app.Model.ProductImage)
-		sellerService := service.NewSellerService(&app.Model.SellerProfile, producService)
+		productImageService := service.NewProdukImageService(&app.Model.ProductImage)
+
+		sellerService := service.NewSellerService(&app.Model.SellerProfile, productImageService)
 		sellerHandler := handler.NewSellerHandler(sellerService)
+
+		buyerService := service.NewBuyerService(&app.Model.BuyerProfile, productImageService)
+		buyerHandler := handler.NewBuyerHandler(buyerService)
+
+		productService := service.NewProductService(&app.Model.Product, productImageService, sellerService)
+		productHandler := handler.NewProductHandler(productService)
+
 		routes.AuthRoutes(v1, authHandler)
 		routes.SellerProfileRoutes(v1, sellerHandler)
+		routes.BuyerRoutes(v1, buyerHandler)
+		routes.ProductRoute(v1, productHandler)
 	}
 
 	return r
