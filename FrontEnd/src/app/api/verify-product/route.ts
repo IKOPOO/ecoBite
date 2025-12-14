@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         const prompt = `
-      Anda adalah sistem verifikasi kualitas produk untuk marketplace food rescue 'ecoBite'.
+      Anda adalah sistem verifikasi kualitas produk untuk marketplace food rescue 'SavorBite'.
 
       TUGAS: Analisis HANYA foto produk yang diunggah. Abaikan jika nama/deskripsi kosong. Fokus pada kelayakan visual makanan.
 

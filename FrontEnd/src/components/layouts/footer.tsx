@@ -6,13 +6,9 @@ export function Footer() {
     <footer className="border-t bg-muted/30">
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
-          {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-primary">
-                <LeafIcon className="size-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold">ecoBite</span>
+              <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-14 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground">
               Marketplace food rescue yang menghubungkan restoran dengan pembeli untuk mengurangi food waste.
@@ -64,7 +60,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 border-t pt-8">
-          <p className="text-center text-sm text-muted-foreground">© 2025 ecoBite. Semua hak dilindungi.</p>
+          <p className="text-center text-sm text-muted-foreground">© 2025 SavorBite. Semua hak dilindungi.</p>
         </div>
       </div>
     </footer>

@@ -67,7 +67,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold md:text-3xl">Dashboard Admin</h1>
-        <p className="text-muted-foreground">Selamat datang di panel administrasi ecoBite</p>
+        <p className="text-muted-foreground">Selamat datang di panel administrasi SavorBite</p>
       </div>
 
       {/* Stats Grid */}
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
             <div>
               <h3 className="text-lg font-semibold text-green-800">Dampak Lingkungan Bulan Ini</h3>
               <p className="text-sm text-green-600">
-                ecoBite telah membantu menyelamatkan makanan dan mengurangi limbah
+                SavorBite telah membantu menyelamatkan makanan dan mengurangi limbah
               </p>
             </div>
           </div>
@@ -181,8 +181,8 @@ export default function AdminDashboard() {
                         tx.status === "completed"
                           ? "bg-green-100 text-green-800"
                           : tx.status === "processing"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-yellow-100 text-yellow-800"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                       }
                     >
                       {tx.status === "completed" ? "Selesai" : tx.status === "processing" ? "Diproses" : "Pending"}

@@ -1,13 +1,9 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
-// import { Analytics } from "@vercel/analytics/react"
 import { Analytics } from "@vercel/analytics/react"
-import { CartProvider } from "@/providers/cart-provider"
-import { AuthProvider } from "@/providers/auth-provider"
-import { NotificationProvider } from "@/providers/notification-provider"
-import { ChatProvider } from "@/providers/chat-provider"
 import "./globals.css"
+import { AppProvider } from "@/providers/app-provider"
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -20,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "ecoBite - Food Rescue Marketplace",
+  title: "SavorBite - Food Rescue Marketplace",
   description:
     "Kurangi Food Waste, Hemat Pengeluaran. Marketplace yang menghubungkan restoran dengan pembeli untuk menjual makanan layak konsumsi dengan harga murah.",
   generator: "v0.app",
@@ -51,13 +47,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${plusJakarta.variable} ${geistMono.variable} font-sans antialiased`}>
-        <AuthProvider>
-          <NotificationProvider>
-            <ChatProvider>
-              <CartProvider>{children}</CartProvider>
-            </ChatProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <AppProvider>{children}</AppProvider>
         <Analytics />
       </body>
     </html>

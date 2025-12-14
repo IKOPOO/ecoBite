@@ -78,7 +78,7 @@ const mockNotifications: Notification[] = [
   {
     id: "notif-6",
     type: "system",
-    title: "Selamat Datang di ecoBite!",
+    title: "Selamat Datang di SavorBite!",
     message: "Terima kasih sudah bergabung. Yuk mulai selamatkan makanan dan hemat pengeluaran!",
     read: true,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),

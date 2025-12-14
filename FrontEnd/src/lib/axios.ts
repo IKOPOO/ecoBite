@@ -82,3 +82,24 @@ api.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // 1. HEADER KHUSUS NGROK (Wajib kalo pake ngrok gratisan)
+    // Ini biar request kamu ga dicegat halaman peringatan ngrok
+    config.headers['ngrok-skip-browser-warning'] = 'true'
+
+    // 2. Token User (Tetap ada)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    }
+
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)

@@ -58,10 +58,8 @@ export function AdminSidebar() {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b border-slate-700 px-6">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Shield className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold">ecoBite Admin</span>
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-12 w-auto" />
+            <span className="text-lg font-bold">Admin</span>
           </div>
 
           {/* Navigation */}
