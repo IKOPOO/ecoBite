@@ -34,13 +34,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
-              <LeafIcon className="size-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold">ecoBite</span>
+            <img src="/savorbite-logo.png" alt="SavorBite Logo" className="h-16 w-auto" />
           </Link>
           <CardTitle className="text-2xl">Selamat Datang Kembali</CardTitle>
-          <CardDescription>Masuk ke akun ecoBite Anda</CardDescription>
+          <CardDescription>Masuk ke akun SavorBite Anda</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

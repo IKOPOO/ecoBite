@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ChevronRightIcon, MapPinIcon, TruckIcon, PackageIcon, LeafIcon } from "@/components/shared/icons"
 import { useCart } from "@/providers/cart-provider"
 import { formatPrice } from "@/lib/data"
+import { toast } from "sonner"
 
 type DeliveryMethod = "pickup" | "delivery"
 type PaymentMethod = "qris" | "cod" | "ewallet"
@@ -37,10 +38,29 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setIsLoading(true)
-    // Simulate order placement
+
+    // Show processing toast
+    toast.loading("Memproses pembayaran...")
+
+    // Simulate payment processing (1.5 seconds)
     await new Promise(resolve => setTimeout(resolve, 1500))
-    clearCart()
-    router.push("/buyer/orders?success=true")
+
+    // 90% success rate for dummy payment
+    const success = Math.random() > 0.1
+
+    toast.dismiss()
+
+    if (success) {
+      // Success
+      const orderId = `ORD-${Date.now()}`
+      toast.success("Pembayaran berhasil!")
+      clearCart()
+      router.push(`/buyer/orders?success=true&order_id=${orderId}`)
+    } else {
+      // Failure  
+      toast.error("Pembayaran gagal. Silakan coba lagi.")
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -79,9 +99,8 @@ export default function CheckoutPage() {
                   >
                     <Label
                       htmlFor="pickup"
-                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
-                        deliveryMethod === "pickup" ? "border-primary bg-primary/5" : "hover:bg-muted"
-                      }`}
+                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${deliveryMethod === "pickup" ? "border-primary bg-primary/5" : "hover:bg-muted"
+                        }`}
                     >
                       <RadioGroupItem value="pickup" id="pickup" />
                       <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
@@ -94,9 +113,8 @@ export default function CheckoutPage() {
                     </Label>
                     <Label
                       htmlFor="delivery"
-                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
-                        deliveryMethod === "delivery" ? "border-primary bg-primary/5" : "hover:bg-muted"
-                      }`}
+                      className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${deliveryMethod === "delivery" ? "border-primary bg-primary/5" : "hover:bg-muted"
+                        }`}
                     >
                       <RadioGroupItem value="delivery" id="delivery" />
                       <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
@@ -158,9 +176,8 @@ export default function CheckoutPage() {
                       <Label
                         key={method.value}
                         htmlFor={method.value}
-                        className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
-                          paymentMethod === method.value ? "border-primary bg-primary/5" : "hover:bg-muted"
-                        }`}
+                        className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${paymentMethod === method.value ? "border-primary bg-primary/5" : "hover:bg-muted"
+                          }`}
                       >
                         <RadioGroupItem value={method.value} id={method.value} />
                         <div>

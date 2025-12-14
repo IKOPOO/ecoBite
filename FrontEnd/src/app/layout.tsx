@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "ecoBite - Food Rescue Marketplace",
+  title: "SavorBite - Food Rescue Marketplace",
   description:
     "Kurangi Food Waste, Hemat Pengeluaran. Marketplace yang menghubungkan restoran dengan pembeli untuk menjual makanan layak konsumsi dengan harga murah.",
   generator: "v0.app",
