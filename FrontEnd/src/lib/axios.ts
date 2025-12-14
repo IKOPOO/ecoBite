@@ -10,6 +10,7 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     // "Accept": "application/json", // Opsional, biar Backend tau kita minta JSON
+    'ngrok-skip-browser-warning': 'true',
   },
   // Timeout 10 detik. Kalo backend kelamaan, kita anggep error (biar user ga nunggu selamanya)
   timeout: 10000,
