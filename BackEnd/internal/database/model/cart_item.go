@@ -18,6 +18,10 @@ type CartItem struct {
 	AddedAt   time.Time `gorm:"autoCreateTime" form:"added_at" json:"added_at"`
 }
 
+func (CartItem) TableName() string {
+	return "cart_item"
+}
+
 func (m *CartItemModel) FindByCartAndProduct(
 	cartID, productID uuid.UUID,
 ) (*CartItem, error) {

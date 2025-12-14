@@ -113,7 +113,7 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	if input.Username == "" || input.Email == "" || input.Password == "" {
+	if input.Email == "" || input.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "All fields (username, email, password, role, fullname) are required"})
 		return
 	}
