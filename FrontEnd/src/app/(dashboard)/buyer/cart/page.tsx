@@ -27,7 +27,7 @@ export default function CartPage() {
             </div>
             <h1 className="mb-2 text-2xl font-bold">Keranjang Kosong</h1>
             <p className="mb-6 text-muted-foreground">Belum ada produk di keranjang Anda</p>
-            <Link href="/marketplace">
+            <Link href="/buyer/marketplace">
               <Button className="gap-2">
                 Mulai Belanja
                 <ChevronRightIcon className="size-4" />

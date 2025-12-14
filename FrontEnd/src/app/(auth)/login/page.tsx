@@ -31,7 +31,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 relative">
-      <BackButton />
+      <BackButton className="absolute left-4 top-4 z-10" label="Kembali" />
       <Card className="w-full max-w-md mt-16">
         <CardHeader className="text-center">
           <Link href="/" className="mx-auto mb-4 flex items-center gap-2">

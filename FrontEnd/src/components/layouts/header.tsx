@@ -73,7 +73,7 @@ export function Header({ variant = "landing" }: HeaderProps) {
           )}
           {variant === "marketplace" && (
             <>
-              <Link href="/marketplace" className="text-sm font-medium text-foreground">
+              <Link href="/buyer/marketplace" className="text-sm font-medium text-foreground">
                 Marketplace
               </Link>
               <Link

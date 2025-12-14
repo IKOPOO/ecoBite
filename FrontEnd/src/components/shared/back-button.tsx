@@ -1,18 +1,37 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ArrowLeftIcon } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button" // Pastikan path ini benar
 
-export default function BackButton() {
+interface BackButtonProps {
+  label?: string
+  className?: string
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+}
+
+export default function BackButton({
+  label,
+  className,
+  variant = "ghost", // Default "ghost" biar transparan & bersih
+}: BackButtonProps) {
   const router = useRouter()
 
   return (
-    <button
+    <Button
+      variant={variant}
+      // Kalau ada label, ukurannya normal. Kalau cuma icon, ukurannya 'icon' (kotak presisi)
+      size={label ? "default" : "icon"}
       onClick={() => router.back()}
-      className="absolute top-4 left-4 inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors z-10"
+      className={cn(
+        "group transition-all hover:-translate-x-1", // Efek animasi geser dikit pas hover
+        className
+      )}
+      title="Kembali" // Tooltip native browser
     >
-      <ArrowLeftIcon className="size-5" />
-      <span className="font-medium">Kembali</span>
-    </button>
+      <ArrowLeft className={cn("size-5", label && "mr-2")} />
+      {label && <span>{label}</span>}
+    </Button>
   )
 }

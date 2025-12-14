@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { useChat } from "@/providers/chat-provider"
 import { ArrowLeftIcon, SendIcon, StoreIcon, ImageIcon, MoreVerticalIcon } from "@/components/shared/icons"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import BackButton from "@/components/shared/back-button"
 
 function formatMessageTime(dateString: string) {
   const date = new Date(dateString)
@@ -90,11 +91,13 @@ export default function ChatConversationPage() {
       {/* Chat Header */}
       <header className="sticky top-0 z-50 border-b bg-background">
         <div className="container mx-auto flex h-16 items-center gap-4 px-4">
-          <Link href="/buyer/chat">
+          {/* <Link href="/buyer/chat">
             <Button variant="ghost" size="icon">
               <ArrowLeftIcon className="size-5" />
             </Button>
-          </Link>
+          </Link> */}
+          {/* <BackButton /> */}
+          <BackButton className="absolute left-4 top-4 z-10" />
 
           <div className="flex flex-1 items-center gap-3">
             <div className="size-10 overflow-hidden rounded-full bg-muted">
