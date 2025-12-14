@@ -13,7 +13,7 @@ func CartRoutes(rg *gin.RouterGroup, cartHandler *handler.CartHandler) {
 	// public api
 	p.Use(auth.AuthMiddleware("BUYER"))
 	{
-		p.POST("/", cartHandler.AddToCart)
+		p.POST("/items", cartHandler.AddToCart)
 	}
 
 }

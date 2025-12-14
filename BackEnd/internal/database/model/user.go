@@ -32,7 +32,7 @@ type RegisterRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password"`
-	Role     string `json:"role"`
+	Role     string `json:"role" binding:"required"`
 }
 
 // insert new user data
