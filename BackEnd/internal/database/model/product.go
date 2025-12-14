@@ -104,3 +104,12 @@ func (m *ProductModel) GetProductBySellerID(sellerID uuid.UUID, page, limit, off
 	return ProductData, total, nil
 
 }
+
+func (m *ProductModel) GetProductByID(id uuid.UUID) (*Product, error) {
+	var product Product
+	if err := m.DB.First(&product, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &product, nil
+
+}

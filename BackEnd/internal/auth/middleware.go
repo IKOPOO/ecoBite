@@ -15,6 +15,7 @@ var RoleGroups = map[string][]string{
 	"ADMIN":  {"admin"},
 	"USER":   {"buyer", "seller"},
 	"SELLER": {"seller"},
+	"BUYER":  {"buyer"},
 }
 
 func ValidateAuth(tokenString string) (*Claims, error) {
