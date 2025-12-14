@@ -21,13 +21,14 @@ func Routes(app *config.Application) http.Handler {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:3000",
+			"http://127.0.0.1:3002",
 			"http://127.0.0.1:3000",
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",
 		},
 		AllowHeaders: []string{
-			"Origin", "Content-Type", "Authorization",
+			"Origin", "Content-Type", "Authorization", "ngrok-skip-browser-warning",
 		},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -47,7 +48,7 @@ func Routes(app *config.Application) http.Handler {
 		productService := service.NewProductService(&app.Model.Product, productImageService, sellerService)
 		productHandler := handler.NewProductHandler(productService)
 
-		cartService := service.NewCartService(&app.Model.Cart, &app.Model.CartItem, productService.Product)
+		cartService := service.NewCartService(&app.Model.Cart, &app.Model.CartItem, productService.Product, buyerService)
 		carthandler := handler.NewCartHandler(*cartService)
 
 		routes.AuthRoutes(v1, authHandler)

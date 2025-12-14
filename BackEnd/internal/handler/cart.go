@@ -27,7 +27,7 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 		return
 	}
 	// ambil buyerid dengan user_id
-	buyer_id, err := h.Service.Buyer.Buyer.GetBuyerProfileById(buyerID)
+	buyer_id, err := h.Service.Buyer.GetBuyerProfileById(buyerID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Buyer Not Found",
@@ -46,7 +46,7 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 
 	// 3️⃣ panggil service
 	if err := h.Service.AddToCart(
-		buyerID,
+		buyer_id.ID,
 		req.ProductID,
 		req.Quantity,
 	); err != nil {
