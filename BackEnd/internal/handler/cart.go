@@ -61,3 +61,20 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 		"message": "item added to cart",
 	})
 }
+
+func (h *CartHandler) GetCartByBuyerID(c *gin.Context) {
+	buyerID := c.MustGet("user_id").(uuid.UUID)
+
+	carts, err := h.Service.GetCartByBuyer(buyerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "cart found and success to get",
+		"cart":    carts,
+	})
+}

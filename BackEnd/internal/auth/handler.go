@@ -88,7 +88,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		Expires:  time.Now().Add(1 * time.Hour),
 		Secure:   true,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	// production response

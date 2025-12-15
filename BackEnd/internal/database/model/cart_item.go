@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type CartItemModel struct {
@@ -41,4 +42,13 @@ func (m *CartItemModel) Create(item *CartItem) error {
 
 func (m *CartItemModel) Update(item *CartItem) error {
 	return m.DB.Save(item).Error
+}
+
+func (m *CartItemModel) GetCartItemByCartID(cartID uuid.UUID) ([]*CartItem, error) {
+	var items []*CartItem
+	if err := m.DB.Where("cart_id = ?", cartID).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
