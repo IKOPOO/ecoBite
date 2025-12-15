@@ -14,6 +14,7 @@ func CartRoutes(rg *gin.RouterGroup, cartHandler *handler.CartHandler) {
 	p.Use(auth.AuthMiddleware("BUYER"))
 	{
 		p.POST("/items", cartHandler.AddToCart)
+		p.GET("/:buyer_id", cartHandler.GetCartByBuyerID)
 	}
 
 }

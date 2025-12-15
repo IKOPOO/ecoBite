@@ -13,6 +13,7 @@ type CartService struct {
 	CartItem *model.CartItemModel
 	Product  *model.ProductModel
 	Buyer    *BuyerService
+	Seller   *SellerService
 }
 
 func NewCartService(
@@ -27,6 +28,11 @@ func NewCartService(
 		Product:  productModel,
 		Buyer:    buyerService,
 	}
+}
+
+type CartWithItem struct {
+	Cart *model.Cart       `json:"cart"`
+	Item []*model.CartItem `json:"item"`
 }
 
 func (s *CartService) AddToCart(
@@ -83,4 +89,39 @@ func (s *CartService) AddToCart(
 
 	item.Quantity += quantity
 	return s.CartItem.Update(item)
+}
+
+func (s *CartService) GetCartByBuyer(buyerID uuid.UUID) (*CartWithItem, error) {
+	// get seller_id
+	sellerID, err := s.Buyer.GetBuyerProfileById(buyerID)
+	if err != nil {
+		return nil, err
+	}
+
+	cartsData, err := s.Cart.FindByBuyerIDAndSellerID(buyerID, sellerID.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var cartItems []*model.CartItem
+	items, err := s.CartItem.GetCartItemByCartID(cartsData.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, data := range items {
+		cartItems = append(cartItems, &model.CartItem{
+			ID:        data.ID,
+			CartID:    data.CartID,
+			ProductID: data.ProductID,
+			Quantity:  data.Quantity,
+		})
+	}
+
+	result := &CartWithItem{
+		Cart: cartsData,
+		Item: cartItems, // sekarang bisa langsung assign
+	}
+
+	return result, nil
 }

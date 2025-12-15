@@ -23,6 +23,7 @@ func Routes(app *config.Application) http.Handler {
 			"http://localhost:3000",
 			"http://127.0.0.1:3002",
 			"http://127.0.0.1:3000",
+			"https://savor-bite.vercel.app",
 		},
 		AllowMethods: []string{
 			"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",

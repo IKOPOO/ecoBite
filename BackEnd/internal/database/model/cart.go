@@ -56,6 +56,15 @@ func (m *CartModel) FindByBuyerAndSeller(
 	return &cart, nil
 }
 
-func (m *CartModel) Create(cart *Cart) error {
+func (m *CartModel) Create(cart *Cart) error { // -> ini yang dipake
 	return m.DB.Create(cart).Error
+}
+
+func (m *CartModel) FindByBuyerIDAndSellerID(buyerID uuid.UUID, sellerID uuid.UUID) (*Cart, error) {
+	var cart *Cart
+	if err := m.DB.Where("buyer_id = ? AND seller_id = ?", buyerID, sellerID).First(&cart).Error; err != nil {
+		return nil, err
+	}
+
+	return cart, nil
 }
