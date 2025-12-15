@@ -9,10 +9,8 @@ export const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    // "Accept": "application/json", // Opsional, biar Backend tau kita minta JSON
-    'ngrok-skip-browser-warning': 'true',
+    // HAPUS header 'ngrok-skip-browser-warning' disini. Cloudflare gak butuh.
   },
-  // Timeout 10 detik. Kalo backend kelamaan, kita anggep error (biar user ga nunggu selamanya)
   timeout: 10000,
 })
 
