@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS product (
     status_kondisi status_kondisi_enum NOT NULL,
     target_user target_user_enum NOT NULL,
     tanggal_kadaluwarsa DATE NOT NULL,
-    image_url TEXT,
     status product_status_enum DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
