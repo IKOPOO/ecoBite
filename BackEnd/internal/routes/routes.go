@@ -6,7 +6,6 @@ import (
 	"ecobite/internal/handler"
 	"ecobite/internal/service"
 
-	//"ecobite/internal/database/model"
 	routes "ecobite/internal/routes/route"
 	"net/http"
 	"time"
@@ -34,6 +33,7 @@ func Routes(app *config.Application) http.Handler {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
 	v1 := r.Group("/api/v1")
 	{
 		authHandler := auth.NewUserauth(&app.Model.Users)
@@ -49,8 +49,9 @@ func Routes(app *config.Application) http.Handler {
 		productService := service.NewProductService(&app.Model.Product, productImageService, sellerService)
 		productHandler := handler.NewProductHandler(productService)
 
-		cartService := service.NewCartService(&app.Model.Cart, &app.Model.CartItem, productService.Product, buyerService)
-		carthandler := handler.NewCartHandler(*cartService)
+		cartService := service.NewCartService(&app.Model.Cart, &app.Model.CartItem, &app.Model.Product)
+		cartQueryService := service.NewCartQueryService(&app.Model.Cart, &app.Model.CartItem, buyerService)
+		carthandler := handler.NewCartHandler(cartService, cartQueryService)
 
 		routes.AuthRoutes(v1, authHandler)
 		routes.SellerProfileRoutes(v1, sellerHandler)

@@ -10,16 +10,19 @@ import (
 )
 
 type CartHandler struct {
-	Service service.CartService
+	CartService      *service.CartService
+	CartQueryService *service.CartQueryService
 }
 
-func NewCartHandler(m service.CartService) *CartHandler {
-	return &CartHandler{Service: m}
+func NewCartHandler(m *service.CartService, q *service.CartQueryService) *CartHandler {
+	return &CartHandler{CartService: m, CartQueryService: q}
 }
 
 func (h *CartHandler) AddToCart(c *gin.Context) {
-	// 1️⃣ ambil buyer_id dari middleware
-	buyerID, ok := c.MustGet("user_id").(uuid.UUID)
+	ctx := c.Request.Context()
+
+	// 1️⃣ ambil userID dari middleware
+	userID, ok := c.MustGet("user_id").(uuid.UUID)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "unauthorized",
@@ -27,7 +30,7 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 		return
 	}
 	// ambil buyerid dengan user_id
-	buyer_id, err := h.Service.Buyer.GetBuyerProfileById(buyerID)
+	buyer_id, err := h.CartQueryService.Buyer.GetBuyerProfileByUserID(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "Buyer Not Found",
@@ -35,7 +38,7 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 		return
 	}
 
-	// 2️⃣ bind request
+	// bind request
 	var req *model.AddToCartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -45,7 +48,8 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 	}
 
 	// 3️⃣ panggil service
-	if err := h.Service.AddToCart(
+	if err := h.CartService.AddToCart(
+		ctx,
 		buyer_id.ID,
 		req.ProductID,
 		req.Quantity,
@@ -63,9 +67,12 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 }
 
 func (h *CartHandler) GetCartByBuyerID(c *gin.Context) {
-	buyerID := c.MustGet("user_id").(uuid.UUID)
+	ctx := c.Request.Context()
 
-	carts, err := h.Service.GetCartByBuyer(buyerID)
+	// take user id from middleware
+	userID := c.MustGet("user_id").(uuid.UUID)
+
+	carts, err := h.CartQueryService.GetCartByBuyerID(ctx, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

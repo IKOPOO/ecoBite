@@ -19,3 +19,11 @@ type OrderItem struct {
 	Subtotal  float64   `gorm:"type:decimal(12,2);not null" json:"subtotal"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 }
+
+func (m *OrderItemModel) WithTx(tx *gorm.DB) *OrderItemModel {
+	return &OrderItemModel{DB: tx}
+}
+
+func (m *OrderItemModel) CreateOrderItem(item *OrderItem) error {
+	return m.DB.Create(item).Error
+}

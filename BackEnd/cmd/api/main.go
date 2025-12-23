@@ -15,13 +15,6 @@ import (
 	//"github.com/go-playground/validator/v10"
 )
 
-// Test user creation API handler
-// @title Web Doscom API
-// @version 1.0
-// @description API Documentation Web Doscom
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
 	// load env
 	env.LoadEnv()
